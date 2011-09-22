@@ -1,0 +1,30 @@
+Mailshare receives email and presents it in a web interface. CC your
+discussions to your Mailshare server's email address. Emails can then
+be viewed in a web browser.
+
+This is intended to be used in a team as an alternative to forwarding
+emails to the whole team.
+
+License
+=======
+
+See https://github.com/RobFisher/mailshare/blob/master/LICENSE
+
+Status
+======
+
+Just starting; nothing works yet; watch this space.
+
+Installation
+============
+
+1. Copy the file mailshare_config_example.py to mailshare_config.py
+2. Edit mailshare_config.py
+
+Use
+===
+
+python3 poll_imap_email.py
+
+See what happens!
+
