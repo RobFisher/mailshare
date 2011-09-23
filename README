@@ -18,8 +18,9 @@ Just starting; nothing works yet; watch this space.
 Installation
 ============
 
-1. Copy the file mailshare_config_example.py to mailshare_config.py
-2. Edit mailshare_config.py
+1. Copy the file settings_example.py to settings.py
+2. Edit settings.py, supplying database details for storing emails and
+IMAP details for retrieving them.
 
 3. Create a database with MySQL, e.g.:
      mysql -u root -p

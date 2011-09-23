@@ -1,16 +1,16 @@
 # License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
 
 import imaplib
-import mailshare_config
+import settings # TODO make this work: from django.conf import settings
 import email
 
 def fetch_messages():
     """Return a list of email.message.Message objects representing some messages in the IMAP mailbox."""
     messages = []
 
-    server = imaplib.IMAP4_SSL(mailshare_config.imap_server)
-    server.login(mailshare_config.imap_username, mailshare_config.imap_password)
-    server.select(mailshare_config.imap_mailbox, readonly = True)
+    server = imaplib.IMAP4_SSL(settings.MAILSHARE_IMAP_HOST)
+    server.login(settings.MAILSHARE_IMAP_USER, settings.MAILSHARE_IMAP_PASSWORD)
+    server.select(settings.MAILSHARE_IMAP_MAILBOX, readonly = True)
     typ, message_ids = server.search(None, 'ALL')
 
     # message_ids is a list with one item, so it looks like this:
