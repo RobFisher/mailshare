@@ -21,6 +21,19 @@ Installation
 1. Copy the file mailshare_config_example.py to mailshare_config.py
 2. Edit mailshare_config.py
 
+3. Create a database with MySQL, e.g.:
+     mysql -u root -p
+     CREATE DATABASE mailshare
+
+4. Let Django set up the database:
+     cd mailshare_web
+     python manage.py syncdb
+   Say yes and answer the prompts when asked to set up a super user
+   for Django's authentication system. We'll probably use this for
+   something one day.
+
+
+
 Use
 ===
 
@@ -28,23 +41,22 @@ python3 process_emails.py
 
 See what happens!
 
-Evironment
-==========
+Environment
+===========
 
 For information, here is how I set up my environment in Ubuntu
 10.04. Other platforms will be supported but I have to start
 somewhere.
 
-python3
- - I want to code in Python 3 but none of the big web frameworks
- support it.
-
 lampserver^
 libabache2-mod-python
 phpmyadmin
 
- - Apache and MySQL. Hook Apache up to Python and phpMyAdmin to see
+ - Apache and MySQL; hook Apache up to Python; and phpMyAdmin to see
  what the database looks like.
+
+python-MySQLdb
+ - Hook Python up to MySQL.
 
 python-django
 python-django-doc
