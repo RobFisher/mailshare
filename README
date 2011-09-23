@@ -24,7 +24,7 @@ Installation
 Use
 ===
 
-python3 poll_imap_email.py
+python3 process_emails.py
 
 See what happens!
 
