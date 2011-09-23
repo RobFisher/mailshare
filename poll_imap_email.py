@@ -24,7 +24,7 @@ def fetch_messages():
         typ, message_data = server.fetch(message_id, '(RFC822)')
         for part in message_data:
             if isinstance(part, tuple):
-                message = email.message_from_string(part[1].decode("utf-8"))
+                message = email.message_from_string(part[1])
                 messages.append(message)
 
     return messages

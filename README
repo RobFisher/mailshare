@@ -32,12 +32,10 @@ Installation
    for Django's authentication system. We'll probably use this for
    something one day.
 
-
-
 Use
 ===
 
-python3 process_emails.py
+python process_emails.py
 
 See what happens!
 

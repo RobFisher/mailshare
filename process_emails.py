@@ -22,10 +22,10 @@ def get_plain_body(message):
 
 def print_message_headers(message):
     """Given an email.message.Message object, print out some interesting headers."""
-    print("To: " + message.get('To'))
-    print("From: " + message.get('From'))
-    print("Subject: " + message.get('Subject'))
-    print("Date: " + message.get('Date'))
+    print "To: " + message.get('To')
+    print "From: " + message.get('From')
+    print "Subject: " + message.get('Subject')
+    print "Date: " + message.get('Date')
 
 if __name__ == '__main__':
     messages = poll_imap_email.fetch_messages()
