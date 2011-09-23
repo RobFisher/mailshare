@@ -28,3 +28,26 @@ python3 process_emails.py
 
 See what happens!
 
+Evironment
+==========
+
+For information, here is how I set up my environment in Ubuntu
+10.04. Other platforms will be supported but I have to start
+somewhere.
+
+python3
+ - I want to code in Python 3 but none of the big web frameworks
+ support it.
+
+lampserver^
+libabache2-mod-python
+phpmyadmin
+
+ - Apache and MySQL. Hook Apache up to Python and phpMyAdmin to see
+ what the database looks like.
+
+python-django
+python-django-doc
+ - I'm probably going to use Django for the web and database
+ stuff. For setting up Django under Ubuntu, see
+ https://wiki.ubuntu.com/Django
