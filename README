@@ -26,19 +26,20 @@ IMAP details for retrieving them.
      mysql -u root -p
      CREATE DATABASE mailshare
 
-4. Let Django set up the database:
-     cd mailshare_web
-     python manage.py syncdb
-   Say yes and answer the prompts when asked to set up a super user
-   for Django's authentication system. We'll probably use this for
-   something one day.
+4. Let Django set up the database: python manage.py syncdb
+
+     Say yes and answer the prompts when asked to set up a super user
+     for Django's authentication system. Later this will be used for
+     the admin interface.
 
 Use
 ===
 
-python process_emails.py
+python manage.py shell
+>>> import mailshare.mailshareapp.process_emails
+>>> mailshare.mailshareapp.process_emails.quick_test()
 
-See what happens!
+You should now have a database containing up to 10 emails.
 
 Environment
 ===========
