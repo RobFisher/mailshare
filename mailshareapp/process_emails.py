@@ -70,6 +70,8 @@ def add_message_to_database(message):
         m.date = datetime_from_email_date(message.get('Date'))
         m.message_id = message.get('Message-ID')
         m.thread_index = message.get('Thread-Index')
+        if m.thread_index == None:
+            m.thread_index = ''
         m.body = get_plain_body(message)
         m.save()
         addresses = message.get_all('to')
