@@ -33,7 +33,7 @@ def get_or_add_addressee(address):
     this seems more useful than the alternative.
     """
     (address_name, address_address) = email.utils.parseaddr(address)
-    addressee_list = Addressee.objects.filter(address__iexact=address)
+    addressee_list = Addressee.objects.filter(address__iexact=address_address)
     result = None
     if len(addressee_list) == 0:
         addressee = Addressee(name=address_name, address=address_address)
