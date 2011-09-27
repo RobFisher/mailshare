@@ -5,22 +5,47 @@ import datetime
 import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Addressee
 
+def get_charset(message):
+    """
+    Gets the charset from the Content-Type header from the specified email.message.Message
+    object. This class has the method get_charset but this returns None.
+    """
+    result = None
+    t = message.get('Content-Type')
+    if t:
+        offset = t.find('charset')
+        if offset != -1:
+            offset = offset + len('charset') + 2
+            charset_len = t[offset:].find('"')
+            if charset_len != -1:
+                result = t[offset:offset+charset_len]
+    return result
+
+
 def get_plain_body(message):
     """Search all the MIME parts of the email.message.Message and return the plain text body."""
-    plain_body = None
+    plain_part = None
     for part in message.walk():
         # for now we assume the first "text/plain" part is what we want
         if part.get_content_type() == 'text/plain':
-            plain_body = part.get_payload()
+            plain_part = part
             # we've found it. Get out of here!
             break
 
         # settle for the first non-multipart payload in case there is no text/plain,
         # but keep looking
-        if not part.is_multipart():
-            plain_body = part.get_payload()
+        if part == None and not part.is_multipart():
+            plain_part = part
 
-    return plain_body
+    # decode any Base64 and convert to utf-8 if needed
+    plain_part_payload = None
+    if plain_part:
+        plain_part_payload = plain_part.get_payload(decode=True)
+        charset = get_charset(plain_part)
+        if charset != None and charset != 'utf-8':
+            plain_part_payload = plain_part_payload.decode(charset).encode('utf-8')
+
+    return plain_part_payload
 
 
 def get_or_add_addressee(address):
