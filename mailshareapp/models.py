@@ -3,6 +3,8 @@ from django.db import models
 class Addressee(models.Model):
     name = models.TextField()
     address = models.TextField()
+    def __unicode__(self):
+        return self.address
 
 class Mail(models.Model):
     sender = models.ForeignKey(Addressee, related_name='sent_mails')
@@ -13,3 +15,5 @@ class Mail(models.Model):
     message_id = models.TextField()
     thread_index = models.TextField()
     body = models.TextField()
+    def __unicode__(self):
+        return self.date.isoformat() + ' ' + self.sender.address[0:20] + ' ' + self.subject[0:30]
