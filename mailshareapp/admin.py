@@ -1,9 +1,9 @@
-from mailshareapp.models import Mail, Addressee
+from mailshareapp.models import Mail, Contact
 from django.contrib import admin
 
 class MailAdmin(admin.ModelAdmin):
     fieldsets = [
-        ('Addressees', {'fields': ['sender', 'to', 'cc']}),
+        ('Contacts', {'fields': ['sender', 'to', 'cc']}),
         ('Details', {'fields': ['subject', 'date']}),
         ('Indexing', {'fields': ['message_id', 'thread_index'], 'classes': ['collapse']}),
         (None, {'fields': ['body']}),
@@ -15,4 +15,4 @@ class MailAdmin(admin.ModelAdmin):
     search_fields = ['subject', 'body']
 
 admin.site.register(Mail, MailAdmin)
-admin.site.register(Addressee)
+admin.site.register(Contact)
