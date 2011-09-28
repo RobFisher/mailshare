@@ -6,23 +6,6 @@ import warnings
 import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Addressee
 
-def get_charset(message):
-    """
-    Gets the charset from the Content-Type header from the specified email.message.Message
-    object. This class has the method get_charset but this returns None.
-    """
-    result = None
-    t = message.get('Content-Type')
-    if t:
-        offset = t.find('charset')
-        if offset != -1:
-            offset = offset + len('charset') + 2
-            charset_len = t[offset:].find('"')
-            if charset_len != -1:
-                result = t[offset:offset+charset_len]
-    return result
-
-
 def get_plain_body(message):
     """Search all the MIME parts of the email.message.Message and return the plain text body."""
     plain_part = None
@@ -42,7 +25,7 @@ def get_plain_body(message):
     plain_part_payload = None
     if plain_part:
         plain_part_payload = plain_part.get_payload(decode=True)
-        charset = get_charset(plain_part)
+        charset = plain_part.get_content_charset()
         if charset != None and charset != 'utf-8':
             plain_part_payload = plain_part_payload.decode(charset).encode('utf-8')
 
