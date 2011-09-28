@@ -32,25 +32,36 @@ def get_plain_body(message):
     return plain_part_payload
 
 
-def get_or_add_addressee(address):
+def get_or_add_addressee(name, address):
     """
-    Accepts address fields from an email header of the form 'Name <email@address>'. Looks
-    up the email address in the Addressee table. If the address does not exist in the table
-    it is added. In all both cases the matching Addressee object is returned.
+    Looks up the email address in the Addressee table. If the address does not exist in the table
+    it is added. In both cases the matching Addressee object is returned.
 
     Email addresses are considered to be case insensitive for now. While not strictly true,
     this seems more useful than the alternative.
     """
-    (address_name, address_address) = email.utils.parseaddr(address)
-    addressee_list = Addressee.objects.filter(address__iexact=address_address)
+    addressee_list = Addressee.objects.filter(address__iexact=address)
     result = None
     if len(addressee_list) == 0:
-        addressee = Addressee(name=address_name, address=address_address)
+        addressee = Addressee(name=name, address=address)
         addressee.save()
         result = addressee
     else:
         result = addressee_list[0]
     return result
+
+
+def add_addressees_to_mail(address_field, address_headers):
+    """
+    Parse out email addresses and add them to the Mail table.
+    address_field: a ManyToManyField linked to the Addressee table
+    address_header: headers retrieved with email.email.Message.get_all
+    """
+    if address_headers != None:
+        addresses = email.utils.getaddresses(address_headers)
+        for (name, address) in addresses:
+            addressee = get_or_add_addressee(name, address)
+            address_field.add(addressee)
 
 
 def datetime_from_email_date(email_date):
@@ -74,7 +85,7 @@ def add_message_to_database(message):
     matching_messages = Mail.objects.filter(message_id__exact=message_id)
     if len(matching_messages) == 0:
         m = Mail()
-        m.sender = get_or_add_addressee(message.get('From'))
+        m.sender = get_or_add_addressee(*email.utils.parseaddr(message.get('from')))
         m.subject = message.get('Subject')
         m.date = datetime_from_email_date(message.get('Date'))
         m.message_id = message.get('Message-ID')
@@ -85,14 +96,8 @@ def add_message_to_database(message):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             m.save()
-        addresses = message.get_all('to')
-        if addresses != None:
-            for address in message.get_all('to'):
-                m.to.add(get_or_add_addressee(address))
-        addresses = message.get_all('cc')
-        if addresses != None:
-            for address in message.get_all('cc'):
-                m.cc.add(get_or_add_addressee(address))
+        add_addressees_to_mail(m.to, message.get_all('to'))
+        add_addressees_to_mail(m.cc, message.get_all('cc'))
 
 
 def print_message_headers(message):
