@@ -2,6 +2,7 @@
 
 import email
 import datetime
+import warnings
 import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Addressee
 
@@ -98,7 +99,9 @@ def add_message_to_database(message):
         if m.thread_index == None:
             m.thread_index = ''
         m.body = get_plain_body(message)
-        m.save()
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            m.save()
         addresses = message.get_all('to')
         if addresses != None:
             for address in message.get_all('to'):
