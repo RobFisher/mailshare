@@ -39,8 +39,15 @@ python manage.py shell
 >>> import mailshare.mailshareapp.process_emails
 >>> mailshare.mailshareapp.process_emails.quick_test()
 
-You should now have a database containing up to 10 emails. You can
-start the Django test server with:
+This downloads 10 emails from the email server and puts them into the
+database. You should now have a database containing up to 10
+emails. All information from the mail server is also logged to a file
+called mailfile. You can delete the database and replay previously
+downloaded messages from this file with:
+
+>>> mailshare.mailshareapp.process_emails.quick_test(True)
+
+To view the database contents, start the Django test server with:
 
 python manage.py runserver
 

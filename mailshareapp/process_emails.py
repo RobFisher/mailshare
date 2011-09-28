@@ -108,8 +108,15 @@ def print_message_headers(message):
     print "Date: " + message.get('Date')
 
 
-def quick_test():
-    messages = poll_imap_email.fetch_messages()
+def quick_test(from_file=False):
+    mail_file_name = 'mailfile'
+    messages = None
+    if from_file:
+        mail_file = open(mail_file_name, 'r')
+        messages = poll_imap_email.read_messages(mail_file)
+    else:
+        mail_file = open(mail_file_name, 'a')
+        messages = poll_imap_email.fetch_messages(10, mail_file)
     for message in messages:
         add_message_to_database(message)
 
