@@ -22,7 +22,7 @@ def get_plain_body(message):
             plain_part = part
 
     # decode any Base64 and convert to utf-8 if needed
-    plain_part_payload = None
+    plain_part_payload = ''
     if plain_part:
         plain_part_payload = plain_part.get_payload(decode=True)
         charset = plain_part.get_content_charset()
