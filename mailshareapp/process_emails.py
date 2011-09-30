@@ -18,11 +18,11 @@ def get_plain_body(message):
 
         # settle for the first non-multipart payload in case there is no text/plain,
         # but keep looking
-        if part == None and not part.is_multipart():
+        if plain_part == None and not part.is_multipart():
             plain_part = part
 
     # decode any Base64 and convert to utf-8 if needed
-    plain_part_payload = None
+    plain_part_payload = ''
     if plain_part:
         plain_part_payload = plain_part.get_payload(decode=True)
         charset = plain_part.get_content_charset()
@@ -107,9 +107,9 @@ def print_message_headers(message):
     print "Subject: " + message.get('Subject')
     print "Date: " + message.get('Date')
 
+mail_file_name = 'mailfile'
 
 def quick_test(from_file=False):
-    mail_file_name = 'mailfile'
     messages = None
     if from_file:
         mail_file = open(mail_file_name, 'r')
@@ -120,6 +120,13 @@ def quick_test(from_file=False):
     for message in messages:
         add_message_to_database(message)
 
+def test_email(n):
+    """Test the nth email in the file."""
+    mail_file = open(mail_file_name, 'r')
+    messages = poll_imap_email.read_messages(mail_file)
+    print_message_headers(messages[n])
+    body = get_plain_body(messages[n])
+    print body
 
 if __name__ == '__main__':
     messages = poll_imap_email.fetch_messages()
