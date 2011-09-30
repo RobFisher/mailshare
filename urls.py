@@ -4,7 +4,14 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns('mailshareapp.views',
+    (r'^$', 'index'),
+    (r'^search/$', 'search'),
+    (r'^browse/$', 'browse'),
+    (r'^view/(?P<email_id>\d+)/$', 'email'),
+)
+
+urlpatterns += patterns('',
     # Example:
     # (r'^mailshare/', include('mailshare.foo.urls')),
 
