@@ -4,7 +4,23 @@
 </head>
 <body>
 <h1>Mailshare Search</h1>
-<p>You searched for {{ search_query }}</p>
+<form action="/search/" name="search" method="GET">
+<input id="query" name="query" value="{{ search_query }}" />
+<input id="submit" type="submit" value="Search" />
+</form>    
+{% if results %}
+    <table border="1">
+    {% for result in results %}
+        <tr>
+            <td>{{ result.date }}</td>
+            <td>{{ result.sender }}</td>
+            <td>{{ result.subject }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% else %}
+    <p>No results found.</p>
+{% endif %}
 </form>    
 </body>
 </html>

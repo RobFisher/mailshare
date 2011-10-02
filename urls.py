@@ -7,8 +7,8 @@ admin.autodiscover()
 urlpatterns = patterns('mailshareapp.views',
     (r'^$', 'index'),
     (r'^search/$', 'search'),
-    (r'^browse/$', 'browse'),
-    (r'^view/(?P<email_id>\d+)/$', 'email'),
+    #(r'^browse/$', 'browse'),
+    #(r'^view/(?P<email_id>\d+)/$', 'email'),
 )
 
 urlpatterns += patterns('',
