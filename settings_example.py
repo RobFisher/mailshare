@@ -59,8 +59,10 @@ SECRET_KEY = '$ge8hg@2_0b1iub(k$-_qld!$mhut&vc@rq9-i0n%@*uy)$y*x'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.eggs.load_template_source',
 )
+
+DAJAXICE_MEDIA_PREFIX='dajaxice'
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -82,5 +84,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'dajaxice',
+    'dajax',    
     'mailshare.mailshareapp',
 )

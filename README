@@ -61,6 +61,8 @@ For information, here is how I set up my environment in Ubuntu
 10.04. Other platforms will be supported but I have to start
 somewhere.
 
+Install these Ubuntu packages:
+
 lampserver^
 libabache2-mod-python
 phpmyadmin
@@ -79,3 +81,8 @@ python-utidylib
 python-lxml
  - I'm probably going to render HTML mails in the web interface. These
  should be useful.
+
+For Dajax:
+sudo apt-get install python-setuptools
+sudo easy_install django-dajaxice
+sudo easy_install django-dajax
