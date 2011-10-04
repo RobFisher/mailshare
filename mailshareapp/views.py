@@ -15,7 +15,7 @@ def search(request):
         Q(subject__icontains=search_query) |
         Q(body__icontains=search_query))
     t = loader.get_template('search.html')
-    c = Context({
+    c = RequestContext(request, {
         'search_query': search_query,
         'results' : results,
     })
