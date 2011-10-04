@@ -73,16 +73,13 @@ phpmyadmin
 python-MySQLdb
  - Hook Python up to MySQL.
 
-python-django python-django-doc
- - Using Django for the web and database stuff. For setting up Django
-   under Ubuntu, see https://wiki.ubuntu.com/Django
-
 python-utidylib
 python-lxml
  - I'm probably going to render HTML mails in the web interface. These
  should be useful.
 
-For Dajax:
+Python libraries:
 sudo apt-get install python-setuptools
+sudo easy_install django
 sudo easy_install django-dajaxice
 sudo easy_install django-dajax

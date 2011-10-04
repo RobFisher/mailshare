@@ -1,9 +1,26 @@
+{% load dajaxice_templatetags %}
+
 <html>
 <head>
 <title>Mailshare</title>
+{% dajaxice_js_import %}
+<script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+function calculate(){
+	Dajaxice.examples.multiply(Dajax.process,{'a':$('a').value,'b':$('b').value})
+}
+</script>
+
 </head>
 <body>
 <h1>Mailshare</h1>
+
+<input type="text" name="a" value="5" id="a"> x
+<input type="text" name="b" value="6" id="b"> =
+<input type="text" name="result" value="" id="result">
+<input type="button" name="caculate" value="Let's Multiply!" id="caculate" onclick="calculate()">
+
 <form action="search/" name="search" method="GET">
 <input id="query" name="query" value="" />
 <input id="submit" type="submit" value="Search" />

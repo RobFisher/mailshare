@@ -1,11 +1,11 @@
-from django.template import Context, loader
+from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db.models import Q
 from mailshareapp.models import Mail
 
 def index(request):
     t = loader.get_template('index.html')
-    c = Context()
+    c = RequestContext(request)
     return HttpResponse(t.render(c))
 
 
