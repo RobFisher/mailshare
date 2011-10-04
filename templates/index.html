@@ -3,12 +3,13 @@
 <html>
 <head>
 <title>Mailshare</title>
+<script src="{{ STATIC_URL }}jquery.js"></script>
 {% dajaxice_js_import %}
 <script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 function calculate(){
-	Dajaxice.examples.multiply(Dajax.process,{'a':$('a').value,'b':$('b').value})
+	Dajaxice.mailshare.mailshareapp.multiply(Dajax.process,{'a':$('a').value,'b':$('b').value})
 }
 </script>
 
