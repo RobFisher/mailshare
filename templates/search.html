@@ -1,6 +1,23 @@
+{% load dajaxice_templatetags %}
+
 <html>
 <head>
 <title>Mailshare Search</title>
+<script src="{{ STATIC_URL }}jquery.js"></script>
+{% dajaxice_js_import %}
+<script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
+
+<script>
+function expand_email(email_id){
+    Dajaxice.mailshare.mailshareapp.expand_email(Dajax.process,{'email_id':email_id})
+}
+
+function set_email_body(data) {
+    element_selector = "#body_" + data.email_id;
+    $(element_selector).html(data.email_body)
+}
+</script>
+
 </head>
 <body>
 <h1>Mailshare Search</h1>
@@ -11,11 +28,14 @@
 {% if results %}
     <table border="1">
     {% for result in results %}
-        <tr>
+        <tr onclick="expand_email({{ result.id }})">
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>
             <td>{{ result.subject }}</td>
         </tr>
+	<tr>
+	  <td colspan="3" id="body_{{ result.id }}">Email body</td>
+	</tr>
     {% endfor %}
     </table>
 {% else %}
