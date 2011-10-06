@@ -1,5 +1,29 @@
-/* email results table styles */
+body {
+    font-family: Verdana,sans-serif;
+}
+
+table {
+    width: 100%;
+    border: 0px;
+}
+
+td {
+    border: 0px;
+    padding: 4px;
+}
+
+tr.odd {
+    background-color: #D3CBC5;
+}
+
+tr.even {
+    background-color: #D3C5C5;
+}
+
+/* email results table classes */
 .hidden {display:none;}
 .empty {display:none;}
 .showing {display:none;}
-.shown {}
+.shown {
+    background-color: #F0F0F0;
+}

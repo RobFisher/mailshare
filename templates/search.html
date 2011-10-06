@@ -46,11 +46,11 @@ function set_email_body(data) {
 <form action="/search/" name="search" method="GET">
 <input id="query" name="query" value="{{ search_query }}" />
 <input id="submit" type="submit" value="Search" />
-</form>    
+</form>
 {% if results %}
     <table border="1">
     {% for result in results %}
-        <tr onclick="toggle_email_body({{ result.id }})">
+        <tr onclick="toggle_email_body({{ result.id }})" class="{% cycle 'odd' 'even' %}"
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>
             <td>{{ result.subject }}</td>
