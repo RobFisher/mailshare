@@ -1,3 +1,5 @@
+# License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
+
 from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db.models import Q
