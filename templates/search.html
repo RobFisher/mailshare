@@ -3,6 +3,7 @@
 <html>
 <head>
 <title>Mailshare Search</title>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}mailshare.css" />
 <script src="{{ STATIC_URL }}jquery.js"></script>
 {% dajaxice_js_import %}
 <script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
@@ -21,11 +22,9 @@ function toggle_email_body(email_id) {
         fetch_email(email_id, $(element));
     }
     else if(c == "shown") {
-        element.attr("style", "display:none");
         element.attr("class", "hidden");
     }
     else if(c == "hidden") {
-        element.attr("style", "");
         element.attr("class", "shown");
     }
 }
@@ -37,7 +36,6 @@ function fetch_email(email_id) {
 function set_email_body(data) {
     element = get_email_body_element(data.email_id);
     element.html(data.email_body)
-    element.attr("style", "")
     element.attr("class", "shown")
 }
 </script>
@@ -58,7 +56,7 @@ function set_email_body(data) {
             <td>{{ result.subject }}</td>
         </tr>
 	<tr>
-	  <td colspan="3" class="empty" style="display:none" id="body_{{ result.id }}">Email body</td>
+	  <td colspan="3" class="empty" id="body_{{ result.id }}">Email body</td>
 	</tr>
     {% endfor %}
     </table>
