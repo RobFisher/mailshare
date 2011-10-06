@@ -14,6 +14,27 @@ function get_email_body_element(email_id) {
     return $(element_selector)
 }
 
+function scroll_to_position(position) {
+    /* http://twigstechtips.blogspot.com/2010/02/jquery-animated-scroll-to-element.html */
+    $('html,body').animate({ scrollTop: position },
+        { duration: 'slow', easing: 'swing'});
+}
+
+function scroll_to_row(element) {
+    body_row = element.parent();
+    hidden_height = body_row.offset().top + body_row.height() -
+        ($(window).scrollTop() + $(window).height());
+    if(hidden_height > 0) {
+        header_row = body_row.prev();
+        if((body_row.height() + header_row.height()) < $(window).height()) {
+            scroll_to_position($(window).scrollTop() + hidden_height);
+        }
+        else {
+            scroll_to_position(header_row.offset().top);
+        }
+    }
+}
+
 function toggle_email_body(email_id) {
     element = get_email_body_element(email_id);
     c = element.attr("class");
@@ -26,6 +47,7 @@ function toggle_email_body(email_id) {
     }
     else if(c == "hidden") {
         element.attr("class", "shown");
+        scroll_to_row(element);
     }
 }
 
@@ -35,8 +57,9 @@ function fetch_email(email_id) {
 
 function set_email_body(data) {
     element = get_email_body_element(data.email_id);
-    element.html(data.email_body)
-    element.attr("class", "shown")
+    element.html(data.email_body);
+    element.attr("class", "shown");
+    scroll_to_row(element);
 }
 </script>
 
@@ -48,7 +71,7 @@ function set_email_body(data) {
 <input id="submit" type="submit" value="Search" />
 </form>
 {% if results %}
-    <table border="1">
+    <table>
     {% for result in results %}
         <tr onclick="toggle_email_body({{ result.id }})" class="{% cycle 'odd' 'even' %}"
             <td>{{ result.date }}</td>
