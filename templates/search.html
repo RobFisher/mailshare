@@ -8,13 +8,37 @@
 <script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
 
 <script>
-function expand_email(email_id){
+function get_email_body_element(email_id) {
+    element_selector = "#body_" + email_id;
+    return $(element_selector)
+}
+
+function toggle_email_body(email_id) {
+    element = get_email_body_element(email_id);
+    c = element.attr("class");
+    if(c == "empty") {
+        element.attr("class", "showing");
+        fetch_email(email_id, $(element));
+    }
+    else if(c == "shown") {
+        element.attr("style", "display:none");
+        element.attr("class", "hidden");
+    }
+    else if(c == "hidden") {
+        element.attr("style", "");
+        element.attr("class", "shown");
+    }
+}
+
+function fetch_email(email_id) {
     Dajaxice.mailshare.mailshareapp.expand_email(Dajax.process,{'email_id':email_id})
 }
 
 function set_email_body(data) {
-    element_selector = "#body_" + data.email_id;
-    $(element_selector).html(data.email_body)
+    element = get_email_body_element(data.email_id);
+    element.html(data.email_body)
+    element.attr("style", "")
+    element.attr("class", "shown")
 }
 </script>
 
@@ -28,13 +52,13 @@ function set_email_body(data) {
 {% if results %}
     <table border="1">
     {% for result in results %}
-        <tr onclick="expand_email({{ result.id }})">
+        <tr onclick="toggle_email_body({{ result.id }})">
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>
             <td>{{ result.subject }}</td>
         </tr>
 	<tr>
-	  <td colspan="3" id="body_{{ result.id }}">Email body</td>
+	  <td colspan="3" class="empty" style="display:none" id="body_{{ result.id }}">Email body</td>
 	</tr>
     {% endfor %}
     </table>
