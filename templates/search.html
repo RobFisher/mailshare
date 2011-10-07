@@ -37,16 +37,15 @@ function scroll_to_row(element) {
 
 function toggle_email_body(email_id) {
     element = get_email_body_element(email_id);
-    c = element.attr("class");
-    if(c == "empty") {
-        element.attr("class", "showing");
+    if(element.hasClass("empty")) {
+        element.toggleClass("empty showing");
         fetch_email(email_id, $(element));
     }
-    else if(c == "shown") {
-        element.attr("class", "hidden");
+    else if(element.hasClass("shown")) {
+        element.toggleClass("shown hidden");
     }
-    else if(c == "hidden") {
-        element.attr("class", "shown");
+    else if(element.hasClass("hidden")) {
+        element.toggleClass("hidden shown");
         scroll_to_row(element);
     }
 }
@@ -58,7 +57,7 @@ function fetch_email(email_id) {
 function set_email_body(data) {
     element = get_email_body_element(data.email_id);
     element.html(data.email_body);
-    element.attr("class", "shown");
+    element.toggleClass("showing shown");
     scroll_to_row(element);
 }
 </script>
@@ -73,13 +72,13 @@ function set_email_body(data) {
 {% if results %}
     <table>
     {% for result in results %}
-        <tr onclick="toggle_email_body({{ result.id }})" class="{% cycle 'odd' 'even' %}"
+        <tr onclick="toggle_email_body({{ result.id }})" class="mailhead {% cycle 'odd' 'even' %}"
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>
             <td>{{ result.subject }}</td>
         </tr>
 	<tr>
-	  <td colspan="3" class="empty" id="body_{{ result.id }}">Email body</td>
+	  <td colspan="3" class="mailbody empty" id="body_{{ result.id }}">Email body</td>
 	</tr>
     {% endfor %}
     </table>

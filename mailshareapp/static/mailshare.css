@@ -22,9 +22,9 @@ tr.even {
 }
 
 /* email results table classes */
+.mailhead {cursor:pointer;}
+.mailbody {background-color: #F0F0F0;}
 .hidden {display:none;}
 .empty {display:none;}
 .showing {display:none;}
-.shown {
-    background-color: #F0F0F0;
-}
+.shown {}
