@@ -4,13 +4,6 @@ from mailshareapp.models import Mail, Contact
 from email_utils import get_html_body
 
 @dajaxice_register
-def multiply(request, a, b):
-    dajax = Dajax()
-    result = int(a) * int(b)
-    dajax.assign('#result', 'value', str(result))
-    return dajax.json()
-
-@dajaxice_register
 def expand_email(request, email_id):
     dajax = Dajax()
     email_body = 'Error retrieving email'
