@@ -79,6 +79,14 @@ def datetime_from_email_date(email_date):
     return dt
 
 
+def get_if_present(message, header):
+    """If the email header specified by header is present in message, return its value."""
+    value = message.get(header)
+    if value == None:
+        value = ''
+    return value
+
+
 def add_message_to_database(message):
     """Add the message to the database if it is unique according to its Message-ID field."""
     message_id = message.get('Message-ID')
@@ -88,10 +96,10 @@ def add_message_to_database(message):
         m.sender = get_or_add_contact(*email.utils.parseaddr(message.get('from')))
         m.subject = message.get('Subject')
         m.date = datetime_from_email_date(message.get('Date'))
-        m.message_id = message.get('Message-ID')
-        m.thread_index = message.get('Thread-Index')
-        if m.thread_index == None:
-            m.thread_index = ''
+        m.message_id = get_if_present(message, 'Message-ID')
+        m.thread_index = get_if_present(message, 'Thread-Index')
+        m.in_reply_to = get_if_present(message, 'In-Reply-To')
+        m.references = get_if_present(message, 'References')
         m.body = get_plain_body(message)
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -127,6 +135,7 @@ def test_email(n):
     print_message_headers(messages[n])
     body = get_plain_body(messages[n])
     print body
+    return messages[n]
 
 if __name__ == '__main__':
     messages = poll_imap_email.fetch_messages()

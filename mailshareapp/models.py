@@ -14,6 +14,8 @@ class Mail(models.Model):
     date = models.DateTimeField(default='')
     message_id = models.TextField(default='')
     thread_index = models.TextField(default='')
+    in_reply_to = models.TextField(default='')
+    references = models.TextField(default='')
     body = models.TextField(default='')
     def __unicode__(self):
         return self.date.isoformat() + ' ' + self.sender.address[0:20] + ' ' + self.subject[0:30]
