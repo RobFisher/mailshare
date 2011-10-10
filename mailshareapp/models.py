@@ -1,3 +1,5 @@
+# License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
+
 from django.db import models
 
 class Contact(models.Model):
@@ -16,6 +18,7 @@ class Mail(models.Model):
     thread_index = models.TextField(default='')
     in_reply_to = models.TextField(default='')
     references = models.TextField(default='')
+    content_type = models.TextField(default='')
     body = models.TextField(default='')
     def __unicode__(self):
         return self.date.isoformat() + ' ' + self.sender.address[0:20] + ' ' + self.subject[0:30]

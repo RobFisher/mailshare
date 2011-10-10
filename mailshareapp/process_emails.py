@@ -6,12 +6,15 @@ import warnings
 import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Contact
 
-def get_plain_body(message):
-    """Search all the MIME parts of the email.message.Message and return the plain text body."""
+def get_body(message):
+    """Search all the MIME parts of the and return a tuple consisting of the content type and text of the body.
+       message: an object of type email.message.Message"""
     plain_part = None
+    content_type = ''
     for part in message.walk():
         # for now we assume the first "text/plain" part is what we want
-        if part.get_content_type() == 'text/plain':
+        content_type = part.get_content_type()
+        if  content_type == 'text/plain':
             plain_part = part
             # we've found it. Get out of here!
             break
@@ -29,7 +32,7 @@ def get_plain_body(message):
         if charset != None and charset != 'utf-8':
             plain_part_payload = plain_part_payload.decode(charset).encode('utf-8')
 
-    return plain_part_payload
+    return (content_type, plain_part_payload)
 
 
 def get_or_add_contact(name, address):
@@ -100,7 +103,7 @@ def add_message_to_database(message):
         m.thread_index = get_if_present(message, 'Thread-Index')
         m.in_reply_to = get_if_present(message, 'In-Reply-To')
         m.references = get_if_present(message, 'References')
-        m.body = get_plain_body(message)
+        (m.content_type, m.body) = get_body(message)
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             m.save()
@@ -133,7 +136,8 @@ def test_email(n):
     mail_file = open(mail_file_name, 'r')
     messages = poll_imap_email.read_messages(mail_file)
     print_message_headers(messages[n])
-    body = get_plain_body(messages[n])
+    (content_type, body) = get_body(messages[n])
+    print "Content type: " + content_type
     print body
     return messages[n]
 
@@ -141,8 +145,8 @@ if __name__ == '__main__':
     messages = poll_imap_email.fetch_messages()
     for message in messages:
         print_message_headers(message)
-        plain_body = get_plain_body(message)
+        (content_type, body) = get_body(message)
         print("-----")
-        print(plain_body)
+        print(body)
         print("-----")
         print("")
