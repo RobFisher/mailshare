@@ -83,3 +83,7 @@ sudo apt-get install python-setuptools
 sudo easy_install django
 sudo easy_install django-dajaxice
 sudo easy_install django-dajax
+
+jQuery:
+mailshareapp/static/query.js is a symlink that should point to a
+version of jQuery, which you can get from http://jquery.com/ .
