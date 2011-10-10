@@ -9,30 +9,30 @@ from mailshare.mailshareapp.models import Mail, Contact
 def get_body(message):
     """Search all the MIME parts of the and return a tuple consisting of the content type and text of the body.
        message: an object of type email.message.Message"""
-    plain_part = None
+    body_part = None
     content_type = ''
     for part in message.walk():
-        # for now we assume the first "text/plain" part is what we want
+        # best case is 'text/html'. For now assume the first of these is what we want.
         content_type = part.get_content_type()
-        if  content_type == 'text/plain':
-            plain_part = part
+        if  content_type == 'text/html':
+            body_part = part
             # we've found it. Get out of here!
             break
 
         # settle for the first non-multipart payload in case there is no text/plain,
         # but keep looking
-        if plain_part == None and not part.is_multipart():
-            plain_part = part
+        if body_part == None and not part.is_multipart():
+            body_part = part
 
     # decode any Base64 and convert to utf-8 if needed
-    plain_part_payload = ''
-    if plain_part:
-        plain_part_payload = plain_part.get_payload(decode=True)
-        charset = plain_part.get_content_charset()
+    body_part_payload = ''
+    if body_part:
+        body_part_payload = body_part.get_payload(decode=True)
+        charset = body_part.get_content_charset()
         if charset != None and charset != 'utf-8':
-            plain_part_payload = plain_part_payload.decode(charset).encode('utf-8')
+            body_part_payload = body_part_payload.decode(charset).encode('utf-8')
 
-    return (content_type, plain_part_payload)
+    return (content_type, body_part_payload)
 
 
 def get_or_add_contact(name, address):
