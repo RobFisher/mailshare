@@ -3,6 +3,8 @@
 import email
 import datetime
 import warnings
+import sys
+import time
 import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Contact
 
@@ -141,12 +143,18 @@ def test_email(n):
     print body
     return messages[n]
 
+def poll_emails(verbose=False):
+    mail_file = open(mail_file_name, 'a')
+    while True:
+        messages = poll_imap_email.fetch_messages(10, mail_file, True)
+        for message in messages:
+            if verbose:
+                print_message_headers(message)
+            add_message_to_database(message)
+        time.sleep(10)
+
 if __name__ == '__main__':
-    messages = poll_imap_email.fetch_messages()
-    for message in messages:
-        print_message_headers(message)
-        (content_type, body) = get_body(message)
-        print("-----")
-        print(body)
-        print("-----")
-        print("")
+    verbose = False
+    if len(sys.argv) > 1 and sys.argv[1] == '-v':
+        verbose = True
+    poll_emails(verbose)

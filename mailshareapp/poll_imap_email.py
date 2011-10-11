@@ -4,7 +4,7 @@ import imaplib
 import settings # TODO make this work: from django.conf import settings
 import email
 
-def fetch_messages(max_messages=10, output_file=None):
+def fetch_messages(max_messages=10, output_file=None, expunge=False):
     """Return a list of email.message.Message objects representing some messages in the IMAP mailbox.
     max_messages: the maximum number of messages to fetch this call
     output_file:  a file to append email data to
@@ -30,6 +30,9 @@ def fetch_messages(max_messages=10, output_file=None):
                     write_part(output_file, part[1])
                 message = email.message_from_string(part[1])
                 messages.append(message)
+        if expunge and settings.MAILSHARE_IMAP_ENABLE_EXPUNGE:
+            typ, response = server.store(message_id, '+FLAGS', '\\Deleted')
+            typ, response = server.expunge()
 
     return messages
 

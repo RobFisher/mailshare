@@ -36,8 +36,8 @@ Use
 ===
 
 python manage.py shell
->>> import mailshare.mailshareapp.process_emails
->>> mailshare.mailshareapp.process_emails.quick_test()
+>>> import mailshareapp.process_emails
+>>> mailshareapp.process_emails.quick_test()
 
 This downloads 10 emails from the email server and puts them into the
 database. You should now have a database containing up to 10
@@ -53,6 +53,17 @@ python manage.py runserver
 
 Visit http://localhost:8000/admin/mailshareapp/mail/ to see the
 emails.
+
+Once you are happy that the IMAP connection is working, you can start
+the full email polling process. In settings.py, make sure that
+MAILSHARE_IMAP_ENABLE_EXPUNGE is set to True. Then:
+
+python manage.py shell
+>>> import mailshareapp.process_emails
+>>> mailshareapp.process_emails.poll_emails(True)
+
+This runs forever, retrieving 10 emails at a time, adding them to the
+database, then deleting them.
 
 Environment
 ===========
@@ -73,10 +84,8 @@ phpmyadmin
 python-MySQLdb
  - Hook Python up to MySQL.
 
-python-utidylib
 python-lxml
- - I'm probably going to render HTML mails in the web interface. These
- should be useful.
+ - used to sanitise HTML from emails.
 
 Python libraries:
 sudo apt-get install python-setuptools
