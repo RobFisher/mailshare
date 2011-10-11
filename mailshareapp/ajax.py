@@ -1,7 +1,7 @@
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 from mailshareapp.models import Mail, Contact
-from email_utils import get_html_body
+from email_utils import *
 
 @dajaxice_register
 def expand_email(request, email_id):
@@ -9,6 +9,7 @@ def expand_email(request, email_id):
     email_body = 'Error retrieving email'
     email = Mail.objects.get(pk=email_id)
     if(email):
-        email_body = get_html_body(email)
+        email_body = get_html_to(email)
+        email_body += get_html_body(email)
     dajax.add_data({'email_id':email_id, 'email_body':email_body}, 'set_email_body')
     return dajax.json()

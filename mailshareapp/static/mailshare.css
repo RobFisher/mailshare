@@ -23,8 +23,23 @@ tr.even {
 
 /* email results table classes */
 .mailhead {cursor:pointer;}
-.mailbody {background-color: #F0F0F0;}
+.mailbody {
+    background-color: #F0F0F0;
+    padding: 0px;
+}
 .hidden {display:none;}
 .empty {display:none;}
 .showing {display:none;}
 .shown {}
+
+.recipients {
+    background-color: #F2F5A9;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.recipients p {
+    margin: 0px;
+}

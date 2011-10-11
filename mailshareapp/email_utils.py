@@ -26,6 +26,7 @@ def sanitise_html(body):
     cleaner = Cleaner(style=False)
     return cleaner.clean_html(body)
 
+
 def get_html_body(email):
     """Given a mailshareapp.models.Mail object, returns the body formatted as HTML."""
     # For now assume all email bodies are HTML or plain text
@@ -33,3 +34,15 @@ def get_html_body(email):
         return sanitise_html(email.body)
     else:
         return plaintext2html(email.body)
+
+
+def get_html_to(email):
+    """Given a mailshareapp.models.Mail object, return the recipients formatted as HTML."""
+    result = '<div class="recipients"><p>To: '
+    recipients = email.to.all() | email.cc.all()
+    result += recipients[0].name
+    for recipient in recipients[1:]:
+        result += ', '
+        result += recipient.name
+    result += '</p></div>'
+    return result
