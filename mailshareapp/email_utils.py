@@ -36,14 +36,24 @@ def get_html_body(email):
         return plaintext2html(email.body)
 
 
+def contact_to_html(contact):
+    """Given a mailshareapp.models.Contact object, return a string representing it in HTML."""
+    result = '<a href="/search.html?contact=' + str(contact.id)
+    if contact.name != '':
+        result += '" title="' + contact.address + '">' + contact.name + '</a>'
+    else:
+        result += '">' + contact.address + '</a>'
+    return result
+
+
 def contacts_to_html(contacts):
     """Given a QuerySet of contacts, return a string representing them in HTML."""
     if len(contacts) == 0:
         return ''
-    result = contacts[0].name
+    result = contact_to_html(contacts[0])
     for contact in contacts[1:]:
         result += ', '
-        result += contact.name
+        result += contact_to_html(contact)
     return result
 
 
