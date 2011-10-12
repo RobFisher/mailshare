@@ -22,3 +22,5 @@ class Mail(models.Model):
     body = models.TextField(default='')
     def __unicode__(self):
         return self.date.isoformat() + ' ' + self.sender.address[0:20] + ' ' + self.subject[0:30]
+    class Meta:
+        ordering = ['-date']
