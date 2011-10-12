@@ -4,6 +4,17 @@ import imaplib
 import settings # TODO make this work: from django.conf import settings
 import email
 
+_server = None
+
+def get_server_connection():
+    """Logs in to the server if needed, Returns an IMAP4 object."""
+    global _server
+    if _server == None:
+        _server = imaplib.IMAP4_SSL(settings.MAILSHARE_IMAP_HOST)
+        _server.login(settings.MAILSHARE_IMAP_USER, settings.MAILSHARE_IMAP_PASSWORD)
+    return _server
+
+
 def fetch_messages(max_messages=10, output_file=None, expunge=False):
     """Return a list of email.message.Message objects representing some messages in the IMAP mailbox.
     max_messages: the maximum number of messages to fetch this call
@@ -11,8 +22,7 @@ def fetch_messages(max_messages=10, output_file=None, expunge=False):
     """
     messages = []
 
-    server = imaplib.IMAP4_SSL(settings.MAILSHARE_IMAP_HOST)
-    server.login(settings.MAILSHARE_IMAP_USER, settings.MAILSHARE_IMAP_PASSWORD)
+    server = get_server_connection()
     server.select(settings.MAILSHARE_IMAP_MAILBOX, readonly = True)
     typ, message_ids = server.search(None, 'ALL')
 
