@@ -36,13 +36,22 @@ def get_html_body(email):
         return plaintext2html(email.body)
 
 
-def get_html_to(email):
+def contacts_to_html(contacts):
+    """Given a QuerySet of contacts, return a string representing them in HTML."""
+    if len(contacts) == 0:
+        return ''
+    result = contacts[0].name
+    for contact in contacts[1:]:
+        result += ', '
+        result += contact.name
+    return result
+
+
+def get_html_recipients(email):
     """Given a mailshareapp.models.Mail object, return the recipients formatted as HTML."""
     result = '<div class="recipients"><p>To: '
-    recipients = email.to.all() | email.cc.all()
-    result += recipients[0].name
-    for recipient in recipients[1:]:
-        result += ', '
-        result += recipient.name
+    result += contacts_to_html(email.to.all())
+    result += '<br />Cc: '
+    result += contacts_to_html(email.cc.all())
     result += '</p></div>'
     return result

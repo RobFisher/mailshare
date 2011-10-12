@@ -9,7 +9,7 @@ def expand_email(request, email_id):
     email_body = 'Error retrieving email'
     email = Mail.objects.get(pk=email_id)
     if(email):
-        email_body = get_html_to(email)
+        email_body = get_html_recipients(email)
         email_body += get_html_body(email)
     dajax.add_data({'email_id':email_id, 'email_body':email_body}, 'set_email_body')
     return dajax.json()
