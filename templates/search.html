@@ -64,11 +64,18 @@ function set_email_body(data) {
 
 </head>
 <body>
-<h1>Mailshare Search</h1>
+<h1><a href="/">Mailshare Search</a></h1>
 <form action="/search/" name="search" method="GET">
 <input id="query" name="query" value="{{ search_query }}" />
 <input id="submit" type="submit" value="Search" />
 </form>
+
+<div class="search_details">
+{% if sender_html %}
+    <div class="search_sender"><p>Sender is {% autoescape off %}{{ sender_html }}{% endautoescape %}</p></div>
+{% endif %}
+</div>
+
 {% if results %}
     <table>
     {% for result in results %}

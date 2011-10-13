@@ -38,7 +38,7 @@ def get_html_body(email):
 
 def contact_to_html(contact):
     """Given a mailshareapp.models.Contact object, return a string representing it in HTML."""
-    result = '<a href="/search.html?contact=' + str(contact.id)
+    result = '<a href="/search/?sender=' + str(contact.id)
     if contact.name != '':
         result += '" title="' + contact.address + '">' + contact.name + '</a>'
     else:
