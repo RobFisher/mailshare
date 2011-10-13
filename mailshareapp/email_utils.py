@@ -27,13 +27,13 @@ def sanitise_html(body):
     return cleaner.clean_html(body)
 
 
-def get_html_body(email):
+def mail_body_to_html(mail):
     """Given a mailshareapp.models.Mail object, returns the body formatted as HTML."""
     # For now assume all email bodies are HTML or plain text
-    if email.content_type == 'text/html':
-        return sanitise_html(email.body)
+    if mail.content_type == 'text/html':
+        return sanitise_html(mail.body)
     else:
-        return plaintext2html(email.body)
+        return plaintext2html(mail.body)
 
 
 def contact_to_html(contact):
@@ -46,7 +46,7 @@ def contact_to_html(contact):
     return result
 
 
-def contacts_to_html(contacts):
+def contacts_queryset_to_html(contacts):
     """Given a QuerySet of contacts, return a string representing them in HTML."""
     if len(contacts) == 0:
         return ''
@@ -57,11 +57,11 @@ def contacts_to_html(contacts):
     return result
 
 
-def get_html_recipients(email):
+def mail_contacts_to_html(mail):
     """Given a mailshareapp.models.Mail object, return the recipients formatted as HTML."""
     result = '<div class="recipients"><p>To: '
-    result += contacts_to_html(email.to.all())
+    result += contacts_queryset_to_html(mail.to.all())
     result += '<br />Cc: '
-    result += contacts_to_html(email.cc.all())
+    result += contacts_queryset_to_html(mail.cc.all())
     result += '</p></div>'
     return result
