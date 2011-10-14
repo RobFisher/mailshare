@@ -34,7 +34,9 @@ def get_int(request, parameter):
 def search(request):
     search_query = get_string(request, 'query')
     sender_id = get_int(request, 'sender')
+    tag_id = get_int(request, 'tag_id')
     sender_html = ''
+    tag_html = ''
     results = Mail.objects.all()
     if search_query != '':
         results = results.filter(
@@ -48,10 +50,19 @@ def search(request):
             pass
         else:
             sender_html = email_utils.contact_to_html(sender)
+    if tag_id != -1:
+        results = results.filter(tags__id=tag_id)
+        try:
+            tag = Tags.objects.get(id=tag_id)
+        except:
+            pass
+        else:
+            tag_html = tags.tag_to_html(tag)
     t = loader.get_template('search.html')
     c = RequestContext(request, {
         'search_query': search_query,
         'sender_html': sender_html,
+        'tag_html': tag_html,
         'results' : results,
     })
     return HttpResponse(t.render(c))
