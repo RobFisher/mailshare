@@ -96,3 +96,45 @@ sudo easy_install django-dajax
 jQuery:
 mailshareapp/static/query.js is a symlink that should point to a
 version of jQuery, which you can get from http://jquery.com/ .
+
+Deployment
+==========
+
+(See also
+http://blog.stannard.net.au/2010/12/11/installing-django-with-apache-and-mod_wsgi-on-ubuntu-10-04/ )
+
+Commands to deploy Mailshare on an Ubuntu 10.04 server:
+
+sudo apt-get install git-core
+git clone git://github.com/RobFisher/mailshare.git
+sudo apt-get install mysql
+sudo apt-get install apache2
+sudo apt-get install python-setuptools
+sudo easy_install django
+sudo easy_install django-dajaxice
+sudo easy_install django-dajax
+sudo apt-get install python-MySQLdb
+sudo apt-get install python-lxml
+sudo mkdir /srv/www
+sudo ln -s `readlink -f mailshare` /srv/www/mailshare
+sudo cp mailshare/apache/mailshare_site /etc/apache2/sites-available/mailshare
+sudo a2ensite mailshare
+sudo /etc/init.d/apache2 reload
+
+cd mailshare
+cp settings_example.py settings.py
+vim settings.py
+# fill in database and IMAP settings; enable IMAP_EXPUNGE;
+# add /srv/www/mailshare/templates to TEMPLATE_DIRS
+
+mysql -u root -p
+mysql> CREATE DATABASE mailshare;
+mysql> quit
+python manage.py syncdb
+
+# whenever you change source code (including settings.py):
+touch mailshare/apache/mailshare.wsgi
+
+# Finally, download jquery, and make sure the symlink mailshare/static/jquery.js
+# points to it.
+

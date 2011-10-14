@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+
+    ServerName mailshare
+    DocumentRoot /srv/www/mailshare
+
+    Alias /static/ /srv/www/mailshare/mailshareapp/static/
+
+    <Directory /srv/www/mailshare>
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+    WSGIDaemonProcess mailshare processes=2 threads=15 display-name=%{GROUP}
+    WSGIProcessGroup mailshare
+
+    WSGIScriptAlias / /srv/www/mailshare/apache/mailshare.wsgi
+
+</VirtualHost>
+
