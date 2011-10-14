@@ -79,7 +79,7 @@ function set_email_body(data) {
 {% if results %}
     <table>
     {% for result in results %}
-        <tr onclick="toggle_email_body({{ result.id }})" class="mailhead {% cycle 'odd' 'even' %}"
+        <tr onclick="toggle_email_body({{ result.id }})" class="mailhead {% cycle 'odd' 'even' %}">
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>
             <td>{{ result.subject }}</td>
