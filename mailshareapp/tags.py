@@ -23,3 +23,26 @@ def add_autotags_to_mail(m):
             else:
                 if found != -1:
                     m.tags.add(t)
+
+
+def tag_to_html(t):
+    """Render the specified tag as HTML."""
+    result = '<a href="/search/?tag_id='
+    result += str(t.id)
+    result += '">'
+    result += t.name
+    result += '</a>'
+    return result
+
+
+def mail_tags_to_html(m):
+    """Render an emails tags to HTML."""
+    result = '<div class="tags"><p>'
+    tags = m.tags.all()
+    if len(tags) > 0:
+        result += tag_to_html(tags[0])
+    for t in tags[1:]:
+        result += ', '
+        result += tag_to_html(t)
+    result += '</p></div>'
+    return result
