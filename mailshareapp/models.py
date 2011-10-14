@@ -2,6 +2,12 @@
 
 from django.db import models
 
+class Tag(models.Model):
+    name = models.CharField(max_length=128)
+    auto = models.BooleanField(default=False)
+    def __unicode__(self):
+        return self.name
+
 class Contact(models.Model):
     name = models.TextField()
     address = models.TextField()
@@ -20,6 +26,7 @@ class Mail(models.Model):
     references = models.TextField(default='')
     content_type = models.TextField(default='')
     body = models.TextField(default='')
+    tags = models.ManyToManyField(Tag, related_name='mails')
     def __unicode__(self):
         return self.date.isoformat() + ' ' + self.sender.address[0:20] + ' ' + self.subject[0:30]
     class Meta:

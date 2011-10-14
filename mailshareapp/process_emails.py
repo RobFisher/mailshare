@@ -6,7 +6,8 @@ import warnings
 import sys
 import time
 import poll_imap_email
-from mailshare.mailshareapp.models import Mail, Contact
+from mailshare.mailshareapp.models import Mail, Contact, Tag
+from tags import add_autotags_to_mail
 
 def get_body(message):
     """Search all the MIME parts of the and return a tuple consisting of the content type and text of the body.
@@ -111,6 +112,7 @@ def add_message_to_database(message):
             m.save()
         add_contacts_to_mail(m.to, message.get_all('to'))
         add_contacts_to_mail(m.cc, message.get_all('cc'))
+        add_autotags_to_mail(m)
 
 
 def print_message_headers(message):
