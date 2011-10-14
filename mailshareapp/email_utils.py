@@ -59,7 +59,9 @@ def contacts_queryset_to_html(contacts):
 
 def mail_contacts_to_html(mail):
     """Given a mailshareapp.models.Mail object, return the recipients formatted as HTML."""
-    result = '<div class="recipients"><p>To: '
+    result = '<div class="recipients"><p>From: '
+    result += contact_to_html(mail.sender)
+    result += '<br />To: '
     result += contacts_queryset_to_html(mail.to.all())
     result += '<br />Cc: '
     result += contacts_queryset_to_html(mail.cc.all())
