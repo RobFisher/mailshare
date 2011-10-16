@@ -1,6 +1,7 @@
 # License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
 
 from django.db import models
+import tags
 
 class Tag(models.Model):
     MAX_TAG_NAME_LENGTH=128
@@ -8,6 +9,10 @@ class Tag(models.Model):
     auto = models.BooleanField(default=False)
     def __unicode__(self):
         return self.name
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        super(Tag, self).save(*args, **kwargs)
+        tags.apply_autotag(self)
 
 class Contact(models.Model):
     name = models.TextField()

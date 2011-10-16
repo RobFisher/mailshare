@@ -2,15 +2,16 @@
 
 import re
 from django.utils.html import strip_tags
-from mailshare.mailshareapp.models import Mail, Tag
+from django.db.models import Q
+import models
 
 def get_or_create_tag(tag_name):
     """Return tag with the specified name, creating it if it doesn't exist."""
     tag_name = tag_name.strip().lower()
-    tags = Tag.objects.filter(name=tag_name)
+    tags = models.Tag.objects.filter(name=tag_name)
     tag = None
     if len(tags) == 0:
-        tag = Tag()
+        tag = models.Tag()
         tag.name = tag_name
         tag.auto = False
         tag.save()
@@ -29,7 +30,7 @@ def add_autotags_to_mail(m):
     # TODO - maybe it would be quicker or better to make a queryset out of the
     # email and use a common function for adding tags to new emails and new
     # tags to existing emails
-    tags = Tag.objects.filter(auto=True)
+    tags = models.Tag.objects.filter(auto=True)
     for t in tags:
         tag_lowercase = t.name.lower()
         if m.subject.lower().find(tag_lowercase) != -1:
@@ -59,7 +60,7 @@ def add_usertags_to_mail(m):
     for taglist in taglists:
         tags = taglist.split(',')
         for tag in tags:
-            if len(tag) <= Tag.MAX_TAG_NAME_LENGTH:
+            if len(tag) <= models.Tag.MAX_TAG_NAME_LENGTH:
                 add_tag_by_name(m, tag)
 
 
@@ -69,6 +70,17 @@ def add_tags_to_mail(m):
     the user by typing "tags:" in an email."""
     add_autotags_to_mail(m)
     add_usertags_to_mail(m)
+
+
+def apply_autotag(tag):
+    """For a new tag, find all the emails that contain it and add it to them."""
+    if not tag.auto:
+        return
+    mails_with_tag = models.Mail.objects.filter(
+        Q(subject__icontains=tag.name) |
+        Q(body__icontains=tag.name))
+    for m in mails_with_tag:
+        m.tags.add(tag)
 
 
 def tag_to_html(t):
