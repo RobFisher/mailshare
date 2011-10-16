@@ -13,7 +13,7 @@ See https://github.com/RobFisher/mailshare/blob/master/LICENSE
 Status
 ======
 
-Just starting; nothing works yet; watch this space.
+Just starting so few features, but it is already somewhat useful.
 
 Installation
 ============
@@ -31,6 +31,15 @@ IMAP details for retrieving them.
      Say yes and answer the prompts when asked to set up a super user
      for Django's authentication system. Later this will be used for
      the admin interface.
+
+5. Set up full text search with MySQL, e.g.:
+     sudo cp mailshare/mysql/mailshare.cnf /etc/mysql/conf.d
+     sudo service mysql restart
+     mysql -u root -p
+     USE mailshare;
+     ALTER TABLE mailshareapp_mail ADD FULLTEXT(body, subject)
+   The config file sets the minimum word length for full text search to
+   3. After that you are just creating the index.
 
 Use
 ===
@@ -108,6 +117,8 @@ Commands to deploy Mailshare on an Ubuntu 10.04 server:
 sudo apt-get install git-core
 git clone git://github.com/RobFisher/mailshare.git
 sudo apt-get install mysql
+sudo cp mailshare/mysql/mailshare.cnf /etc/mysql/conf.d/
+sudo service mysql restart
 sudo apt-get install apache2
 sudo apt-get install python-setuptools
 sudo easy_install django
@@ -131,6 +142,10 @@ mysql -u root -p
 mysql> CREATE DATABASE mailshare;
 mysql> quit
 python manage.py syncdb
+mysql -u root -p
+mysql> USE mailshare;
+mysql> ALTER TABLE mailshareapp_mail ADD FULLTEXT(body, subject)
+bmysql> quit
 
 # whenever you change source code (including settings.py):
 touch mailshare/apache/mailshare.wsgi

@@ -26,26 +26,15 @@ def add_tag_by_name(m, tag_name):
 
 
 def add_autotags_to_mail(m):
-    """Search the mail body for each autotag and add it if found"""
-    # TODO - maybe it would be quicker or better to make a queryset out of the
-    # email and use a common function for adding tags to new emails and new
-    # tags to existing emails
+    """Search the mail for each autotag and add it if found"""
     tags = models.Tag.objects.filter(auto=True)
+    mail_as_queryset = models.Mail.objects.filter(id=m.id)
     for t in tags:
-        tag_lowercase = t.name.lower()
-        if m.subject.lower().find(tag_lowercase) != -1:
+        matches = mail_as_queryset.filter(
+            Q(subject__search=t.name) |
+            Q(body__search=t.name))
+        if len(matches) > 0:
             m.tags.add(t)
-        # TODO: find out why this gives UnicodeDecodeError: 'ascii' codec can't decode
-        # Where is the ascii here?
-        #elif m.body.lower().find(tag_lowercase) != -1:
-        else:
-            try:
-                found = m.body.lower().find(tag_lowercase)
-            except UnicodeDecodeError:
-                pass
-            else:
-                if found != -1:
-                    m.tags.add(t)
 
 
 user_tags_expression = r'tags:\s*([,-\.\w ]*)'
@@ -77,8 +66,8 @@ def apply_autotag(tag):
     if not tag.auto:
         return
     mails_with_tag = models.Mail.objects.filter(
-        Q(subject__icontains=tag.name) |
-        Q(body__icontains=tag.name))
+        Q(subject__search=tag.name) |
+        Q(body__search=tag.name))
     for m in mails_with_tag:
         m.tags.add(tag)
 

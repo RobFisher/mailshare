@@ -40,8 +40,8 @@ def search(request):
     results = Mail.objects.all()
     if search_query != '':
         results = results.filter(
-            Q(subject__icontains=search_query) |
-            Q(body__icontains=search_query))
+            Q(subject__search=search_query) |
+            Q(body__search=search_query))
     if sender_id != -1:
         results = results.filter(sender__id=sender_id)
         try:
