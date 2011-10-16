@@ -3,7 +3,8 @@
 from django.db import models
 
 class Tag(models.Model):
-    name = models.CharField(max_length=128)
+    MAX_TAG_NAME_LENGTH=128
+    name = models.CharField(max_length=MAX_TAG_NAME_LENGTH)
     auto = models.BooleanField(default=False)
     def __unicode__(self):
         return self.name
