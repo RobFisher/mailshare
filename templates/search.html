@@ -60,6 +60,31 @@ function set_email_body(data) {
     element.toggleClass("showing shown");
     scroll_to_row(element);
 }
+
+function add_tag(email_id) {
+    $("#tagbutton_" + email_id).toggleClass("shown hidden");
+    tagbox=$("#tagbox_" + email_id);
+    tagbox.toggleClass("hidden shown");
+    tagbox.focus();
+}
+
+function tag_key(event, email_id) {
+    if(event.keyCode == KeyEvent.DOM_VK_RETURN) {
+        tagbox=$("#tagbox_" + email_id);
+        tag = tagbox.val();
+        Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':tag});
+    }
+}
+
+function update_tags(data) {
+    $("#taglist_" + data.email_id).html(data.tags_html);
+    $("#tagbox_" + data.email_id).val('');
+}
+
+function tagbox_blur(email_id) {
+    $("#tagbox_" + email_id).toggleClass("shown hidden");
+    $("#tagbutton_" + email_id).toggleClass("shown hidden");
+}
 </script>
 
 </head>

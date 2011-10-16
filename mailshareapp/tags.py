@@ -93,14 +93,25 @@ def tag_to_html(t):
     return result
 
 
-def mail_tags_to_html(m):
-    """Render an emails tags to HTML."""
-    result = '<div class="tags"><p>Tags: '
+def mail_tags_to_html_list(m):
+    result = ''
     tags = m.tags.all()
     if len(tags) > 0:
         result += tag_to_html(tags[0])
     for t in tags[1:]:
         result += ', '
         result += tag_to_html(t)
+    return result
+
+
+def mail_tags_to_html(m):
+    """Render an emails tags to HTML."""
+    result = '<div class="tags"><p>Tags: <span id="taglist_' + str(m.id)  + '"'
+    result += mail_tags_to_html_list(m) + '</span>'
+    result += '<input class="hidden" id="tagbox_' + str(m.id)
+    result += '" onkeypress="tag_key(event, ' + str(m.id)
+    result += ')" onblur="tagbox_blur(' + str(m.id) + ')" />'
+    result += '<input type="button" class="shown" value="+" id="tagbutton_'
+    result += str(m.id) + '" onClick="add_tag(' + str(m.id) + ')" />'
     result += '</p></div>'
     return result
