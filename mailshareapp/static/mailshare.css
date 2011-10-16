@@ -43,3 +43,15 @@ tr.even {
 .recipients p {
     margin: 0px;
 }
+
+.tags {
+    background-color: #BCF5A9;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.tags p {
+    margin: 0px;
+}

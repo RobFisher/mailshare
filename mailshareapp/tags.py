@@ -83,7 +83,7 @@ def tag_to_html(t):
 
 def mail_tags_to_html(m):
     """Render an emails tags to HTML."""
-    result = '<div class="tags"><p>'
+    result = '<div class="tags"><p>Tags: '
     tags = m.tags.all()
     if len(tags) > 0:
         result += tag_to_html(tags[0])
