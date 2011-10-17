@@ -106,7 +106,7 @@ def mail_tags_to_html_list(m):
 
 def mail_tags_to_html(m):
     """Render an emails tags to HTML."""
-    result = '<div class="tags"><p>Tags: <span id="taglist_' + str(m.id)  + '"'
+    result = '<div class="tags"><p>Tags: <span id="taglist_' + str(m.id)  + '">'
     result += mail_tags_to_html_list(m) + '</span>'
     result += '<input class="hidden" id="tagbox_' + str(m.id)
     result += '" onkeypress="tag_key(event, ' + str(m.id)

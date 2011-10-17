@@ -69,7 +69,7 @@ function add_tag(email_id) {
 }
 
 function tag_key(event, email_id) {
-    if(event.keyCode == KeyEvent.DOM_VK_RETURN) {
+    if(event.keyCode == 13) {
         tagbox=$("#tagbox_" + email_id);
         tag = tagbox.val();
         Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':tag});
