@@ -4,9 +4,11 @@
 <head>
 <title>Mailshare Search</title>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}mailshare.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}jquery-ui/jquery-ui-1.8.16.custom.css" />
 <script src="{{ STATIC_URL }}jquery.js"></script>
 {% dajaxice_js_import %}
 <script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}jquery-ui/jquery-ui-1.8.16.custom.min.js"></script>
 
 <script>
 function get_email_body_element(email_id) {
@@ -65,6 +67,7 @@ function add_tag(email_id) {
     $("#tagbutton_" + email_id).toggleClass("shown hidden");
     tagbox=$("#tagbox_" + email_id);
     tagbox.toggleClass("hidden shown");
+    tagbox.autocomplete({source: ["cheese", "chairs", "cars", "fonts", "force"]});
     tagbox.focus();
 }
 
