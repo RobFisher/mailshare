@@ -1,6 +1,7 @@
 # License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
 
 import re
+import math
 from django.utils.html import strip_tags
 from django.db.models import Q
 import models
@@ -104,3 +105,60 @@ def mail_tags_to_html(m):
     result += str(m.id) + '" onClick="add_tag(' + str(m.id) + ')" />'
     result += '</p></div>'
     return result
+
+
+def build_tags_histogram(queryset):
+    """Given a queryset containing Mail objects, return a sorted list of (tag, frequency) tuples."""
+    tags_dict = {}
+    for mail in queryset:
+        tags = mail.tags.all()
+        for tag in tags:
+            if tag in tags_dict:
+                tags_dict[tag] += 1
+            else:
+                tags_dict[tag] = 1
+    tags_list = tags_dict.items()
+    tags_histogram = sorted(tags_list, key=lambda entry: entry[0].name)
+    return tags_histogram
+
+
+def search_results_to_tag_list_html(queryset):
+    """Given a queryset containing Mail objects, return a tag list rendered in HTML"""
+    result = '<ul>'
+    h = build_tags_histogram(queryset)
+    for (tag, frequency) in h:
+        result += '<li>' + tag_to_html(tag) + ': ' + str(frequency) + '</li>'
+    result += '</ul>'
+    return result
+
+
+MIN_FONT_SIZE = 8
+MAX_FONT_SIZE = 24
+
+def get_tag_cloud_size(freq, max_freq, min_freq):
+    """Return font size given the frequency of a tag and the min and max frequencies found in the set of tags."""
+    min_freq = min_freq - 0.5
+    max_freq = max_freq + 0.5
+    freq -= min_freq
+    max_freq -= min_freq
+    proportion = math.sqrt(freq) / math.sqrt(max_freq)
+    font_size = ((MAX_FONT_SIZE-MIN_FONT_SIZE) * proportion) + MIN_FONT_SIZE
+    return int(font_size)
+
+
+def search_results_to_tag_cloud_html(queryset):
+    """Given a queryset containing Mail objects, return a tag cloud rendered in HTML"""
+    result = ''
+    h = build_tags_histogram(queryset)
+    if len(h) > 0:
+        min_freq = min(h, key=lambda entry: entry[1])[1]
+        max_freq = max(h, key=lambda entry: entry[1])[1]
+        for (tag, frequency) in h:
+            size = get_tag_cloud_size(frequency, max_freq, min_freq)
+            font_size = str(size)
+            padding = str(size/4)
+            result += '<span style="font-size: ' + font_size + 'px; padding: ' + padding + 'px;">'
+            result += tag_to_html(tag) + ' '
+            result += '</span>'
+    return result
+

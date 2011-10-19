@@ -104,6 +104,11 @@ function tagbox_blur(email_id) {
 {% endif %}
 </div>
 
+<p>Tag cloud for these results:</p>
+<div class="tag_cloud">
+    {% autoescape off %}{{ tag_cloud }}{% endautoescape %}
+</div>
+
 {% if results %}
     <table>
     {% for result in results %}

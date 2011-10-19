@@ -3,8 +3,9 @@
 from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db.models import Q
-from mailshareapp.models import Mail, Contact
+from mailshareapp.models import Mail, Contact, Tag
 import email_utils
+import tags
 
 def index(request):
     t = loader.get_template('index.html')
@@ -53,16 +54,20 @@ def search(request):
     if tag_id != -1:
         results = results.filter(tags__id=tag_id)
         try:
-            tag = Tags.objects.get(id=tag_id)
-        except:
+            tag = Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
             pass
         else:
             tag_html = tags.tag_to_html(tag)
+
+    tag_cloud = tags.search_results_to_tag_cloud_html(results)
+
     t = loader.get_template('search.html')
     c = RequestContext(request, {
         'search_query': search_query,
         'sender_html': sender_html,
         'tag_html': tag_html,
+        'tag_cloud': tag_cloud,
         'results' : results,
     })
     return HttpResponse(t.render(c))
