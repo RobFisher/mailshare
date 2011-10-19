@@ -124,14 +124,14 @@ def print_message_headers(message):
 
 mail_file_name = 'mailfile'
 
-def quick_test(from_file=False):
+def quick_test(from_file=False, num_emails=10):
     messages = None
     if from_file:
         mail_file = open(mail_file_name, 'r')
         messages = poll_imap_email.read_messages(mail_file)
     else:
         mail_file = open(mail_file_name, 'a')
-        messages = poll_imap_email.fetch_messages(10, mail_file)
+        messages = poll_imap_email.fetch_messages(num_emails, mail_file)
     for message in messages:
         add_message_to_database(message)
 
