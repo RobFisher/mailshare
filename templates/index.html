@@ -3,6 +3,7 @@
 <html>
 <head>
 <title>Mailshare</title>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}mailshare.css" />
 <script src="{{ STATIC_URL }}jquery.js"></script>
 {% dajaxice_js_import %}
 <script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
@@ -12,6 +13,10 @@
 <form action="search/" name="search" method="GET">
 <input id="query" name="query" value="" />
 <input id="submit" type="submit" value="Search" />
-</form>    
+</form>
+<p>Tag cloud from emails in the last week:</p>
+<div class="tag_cloud">
+    {% autoescape off %}{{ tag_cloud }}{% endautoescape %}
+</div>
 </body>
 </html>

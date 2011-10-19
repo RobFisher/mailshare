@@ -1,5 +1,6 @@
 # License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
 
+import datetime
 from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db.models import Q
@@ -8,8 +9,10 @@ import email_utils
 import tags
 
 def index(request):
+    last_week_emails = Mail.objects.filter(date__gte=datetime.date.today()-datetime.timedelta(7))
+    tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails)
     t = loader.get_template('index.html')
-    c = RequestContext(request)
+    c = RequestContext(request, {'tag_cloud':tag_cloud,})
     return HttpResponse(t.render(c))
 
 
