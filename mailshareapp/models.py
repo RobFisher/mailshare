@@ -13,6 +13,8 @@ class Tag(models.Model):
         self.name = self.name.lower()
         super(Tag, self).save(*args, **kwargs)
         tags.apply_autotag(self)
+    class Meta:
+        ordering = ['name']
 
 class Contact(models.Model):
     name = models.TextField()
