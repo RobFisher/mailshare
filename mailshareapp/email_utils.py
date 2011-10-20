@@ -27,7 +27,7 @@ def sanitise_html(body):
     return cleaner.clean_html(body)
 
 
-def mail_body_to_html(mail):
+def mail_body_html(mail):
     """Given a mailshareapp.models.Mail object, returns the body formatted as HTML."""
     # For now assume all email bodies are HTML or plain text
     if mail.content_type == 'text/html':
@@ -57,11 +57,20 @@ def contacts_queryset_to_html(contacts):
     return result
 
 
-def mail_contacts_to_html(mail):
-    """Given a mailshareapp.models.Mail object, return the recipients formatted as HTML."""
-    result = '<div class="recipients"><p>From: '
-    result += contact_to_html(mail.sender)
-    result += '<br />To: '
+def mail_permalink_html(mail):
+    """Generate permalink to a mail in HTML."""
+    result = '<a href="/search/?mail_id='
+    result += str(mail.id)
+    result += '">permalink</a>'
+    return result
+
+
+def mail_contacts_bar_html(mail):
+    """Given a mailshareapp.models.Mail object, generate the contacts bar in HTML."""
+    result = '<div class="recipients"><p style="float:left;">From: '
+    result += contact_to_html(mail.sender) + '</p><p style="float:right;">'
+    result += mail_permalink_html(mail) + '</p><div style="clear:both;"></div>'
+    result += 'To: '
     result += contacts_queryset_to_html(mail.to.all())
     result += '<br />Cc: '
     result += contacts_queryset_to_html(mail.cc.all())

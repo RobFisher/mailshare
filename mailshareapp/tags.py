@@ -94,8 +94,8 @@ def mail_tags_to_html_list(m):
     return result
 
 
-def mail_tags_to_html(m):
-    """Render an emails tags to HTML."""
+def mail_tags_bar_html(m):
+    """Generate tags bar for mail in HTML."""
     result = '<div class="tags"><p>Tags: <span id="taglist_' + str(m.id)  + '">'
     result += mail_tags_to_html_list(m) + '</span>'
     result += '<input class="hidden" id="tagbox_' + str(m.id)

@@ -36,6 +36,7 @@ def get_int(request, parameter):
 
 
 def search(request):
+    mail_id = get_int(request, 'mail_id')
     search_query = get_string(request, 'query')
     sender_id = get_int(request, 'sender')
     tag_id = get_int(request, 'tag_id')
@@ -46,6 +47,8 @@ def search(request):
         results = results.filter(
             Q(subject__search=search_query) |
             Q(body__search=search_query))
+    if mail_id != -1:
+        results = results.filter(id=mail_id)
     if sender_id != -1:
         results = results.filter(sender__id=sender_id)
         try:
