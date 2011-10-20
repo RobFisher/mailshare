@@ -47,7 +47,11 @@ def delete_tag(request, email_id, tag_id):
 @dajaxice_register
 def tag_completion(request, text):
     dajax = Dajax()
-    tags = Tag.objects.filter(name__icontains=text)
+    tags = None
+    if len(text) == 1:
+        tags = Tag.objects.filter(name__istartswith=text)
+    else:
+        tags = Tag.objects.filter(name__icontains=text)
     response = []
     for tag in tags:
         response.append(tag.name)
