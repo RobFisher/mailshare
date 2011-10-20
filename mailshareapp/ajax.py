@@ -1,6 +1,6 @@
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
-from mailshareapp.models import Mail, Contact
+from mailshareapp.models import Mail, Contact, Tag
 from email_utils import *
 import tags
 
@@ -26,4 +26,17 @@ def add_tag(request, email_id, tag):
         mails[0].tags.add(t)
     tags_html = tags.mail_tags_to_html_list(mails[0])
     dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
+    return dajax.json()
+
+
+@dajaxice_register
+def tag_completion(request, text):
+    dajax = Dajax()
+    tags = Tag.objects.filter(name__icontains=text)
+    response = []
+    for tag in tags:
+        response.append(tag.name)
+    print text
+    print response
+    dajax.add_data({'tags':response}, 'set_tag_completion')
     return dajax.json()

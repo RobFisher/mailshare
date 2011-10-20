@@ -63,11 +63,23 @@ function set_email_body(data) {
     scroll_to_row(element);
 }
 
+tag_response_callback = null;
+function fetch_tag_completion(request, response) {
+    tag_response_callback = response;
+    Dajaxice.mailshare.mailshareapp.tag_completion(Dajax.process,{'text':request.term});
+}
+
+function set_tag_completion(data) {
+    if(tag_response_callback) {
+        tag_response_callback(data.tags);
+    }
+}
+
 function add_tag(email_id) {
     $("#tagbutton_" + email_id).toggleClass("shown hidden");
     tagbox=$("#tagbox_" + email_id);
     tagbox.toggleClass("hidden shown");
-    tagbox.autocomplete({source: ["cheese", "chairs", "cars", "fonts", "force"]});
+    tagbox.autocomplete({source: fetch_tag_completion});
     tagbox.focus();
 }
 
