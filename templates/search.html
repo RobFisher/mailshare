@@ -79,15 +79,26 @@ function add_tag(email_id) {
     $("#tagbutton_" + email_id).toggleClass("shown hidden");
     tagbox=$("#tagbox_" + email_id);
     tagbox.toggleClass("hidden shown");
-    tagbox.autocomplete({source: fetch_tag_completion});
+    tagbox.autocomplete({source: fetch_tag_completion,
+                         select: tag_select_callback(email_id)});
     tagbox.focus();
+}
+
+function add_tag_to_email(email_id, text) {
+    Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':text});
 }
 
 function tag_key(event, email_id) {
     if(event.keyCode == 13) {
         tagbox=$("#tagbox_" + email_id);
-        tag = tagbox.val();
-        Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':tag});
+        add_tag_to_email(email_id, tagbox.val());
+    }
+}
+
+/* for explanation see http://stackoverflow.com/questions/939032/jquery-pass-more-parameters-into-callback */
+var tag_select_callback=function tag_selected(email_id) {
+    return function(event, ui) {
+        add_tag_to_email(email_id, ui.item.value);
     }
 }
 
