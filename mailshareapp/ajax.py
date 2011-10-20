@@ -36,7 +36,5 @@ def tag_completion(request, text):
     response = []
     for tag in tags:
         response.append(tag.name)
-    print text
-    print response
     dajax.add_data({'tags':response}, 'set_tag_completion')
     return dajax.json()
