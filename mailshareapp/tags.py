@@ -83,14 +83,30 @@ def tag_to_html(t):
     return result
 
 
+def tag_to_delete_html(m, t):
+    """Render a delete link for the specified mail and tag as HTML."""
+    result = '[<a href="#" onclick="delete_tag(' + str(m.id) + ',' + str(t.id) + '); return false;">x</a>]'
+    return result
+
+
+def undo_delete_html(m, t):
+    """Render an undo link for a deleted tag as HTML."""
+    result = ' Tag ' + t.name + ' deleted ['
+    result += '<a href="#" onclick="add_tag_to_email(' + str(m.id) + ',\'' + t.name + '\'); return false;">'
+    result += 'undo</a>]'
+    return result
+
+
 def mail_tags_to_html_list(m):
     result = ''
     tags = m.tags.all()
     if len(tags) > 0:
         result += tag_to_html(tags[0])
+        result += tag_to_delete_html(m, tags[0])
     for t in tags[1:]:
         result += ', '
         result += tag_to_html(t)
+        result += tag_to_delete_html(m, t)
     return result
 
 

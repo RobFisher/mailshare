@@ -75,6 +75,11 @@ function add_tag_to_email(email_id, text) {
     Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':text});
 }
 
+function delete_tag(email_id, tag_id) {
+    Dajaxice.mailshare.mailshareapp.delete_tag(Dajax.process,{'email_id':email_id,'tag_id':tag_id});
+    return false;
+}
+
 function tag_key(event, email_id) {
     if(event.keyCode == 13) {
         tagbox=$("#tagbox_" + email_id);

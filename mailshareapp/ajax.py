@@ -29,6 +29,22 @@ def add_tag(request, email_id, tag):
 
 
 @dajaxice_register
+def delete_tag(request, email_id, tag_id):
+    dajax = Dajax()
+    try:
+        mail = Mail.objects.get(id=email_id)
+        tag = Tag.objects.get(id=tag_id)
+    except (Mail.DoesNotExist, Mail.MultipleObjectsReturned, Tag.DoesNotExist, Tag.MultipleObjectsReturned):
+        pass
+    else:
+        mail.tags.remove(tag)
+        tags_html = tags.mail_tags_to_html_list(mail)
+        tags_html += tags.undo_delete_html(mail, tag)
+        dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
+    return dajax.json()
+
+
+@dajaxice_register
 def tag_completion(request, text):
     dajax = Dajax()
     tags = Tag.objects.filter(name__icontains=text)
