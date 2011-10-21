@@ -35,6 +35,14 @@ def get_int(request, parameter):
     return result
 
 
+def get_expanded_html(mail):
+    """Return the HTML representing the expanded email."""
+    expanded_html = email_utils.mail_contacts_bar_html(mail)
+    expanded_html += tags.mail_tags_bar_html(mail)
+    expanded_html += email_utils.mail_body_html(mail)
+    return expanded_html
+
+
 def search(request):
     mail_id = get_int(request, 'mail_id')
     search_query = get_string(request, 'query')
@@ -42,6 +50,8 @@ def search(request):
     tag_id = get_int(request, 'tag_id')
     sender_html = ''
     tag_html = ''
+    tag_cloud = ''
+    expanded_html = ''
     results = Mail.objects.all()
     if search_query != '':
         results = results.filter(
@@ -66,7 +76,10 @@ def search(request):
         else:
             tag_html = tags.tag_to_html(tag)
 
-    tag_cloud = tags.search_results_to_tag_cloud_html(results)
+    if len(results) == 1:
+        expanded_html = get_expanded_html(results[0])
+    elif len(results) != 0:
+        tag_cloud = tags.search_results_to_tag_cloud_html(results)
 
     t = loader.get_template('search.html')
     c = RequestContext(request, {
@@ -74,6 +87,7 @@ def search(request):
         'sender_html': sender_html,
         'tag_html': tag_html,
         'tag_cloud': tag_cloud,
+        'expanded_html': expanded_html,
         'results' : results,
     })
     return HttpResponse(t.render(c))

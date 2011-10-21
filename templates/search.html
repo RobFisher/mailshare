@@ -28,21 +28,33 @@
 {% endif %}
 </div>
 
-<p>Tag cloud for these results:</p>
-<div class="tag_cloud">
-    {% autoescape off %}{{ tag_cloud }}{% endautoescape %}
-</div>
+{% if tag_cloud %}
+    <p>Tag cloud for these results:</p>
+    <div class="tag_cloud">
+        {% autoescape off %}{{ tag_cloud }}{% endautoescape %}
+    </div>
+{% endif %}
 
 {% if results %}
     <table>
     {% for result in results %}
+        {% if expanded_html %}
+        <tr class="odd">
+        {% else %}
         <tr onclick="toggle_email_body({{ result.id }})" class="mailhead {% cycle 'odd' 'even' %}">
+        {% endif %}
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>
             <td>{{ result.subject }}</td>
         </tr>
 	<tr>
-	  <td colspan="3" class="mailbody empty" id="body_{{ result.id }}">Email body</td>
+            {% if expanded_html %}
+            <td colspan="3" class="mailbody shown" id="body_{{ result.id }}">
+                {% autoescape off %}{{ expanded_html }}{% endautoescape %}
+            </td>
+            {% else %}
+	    <td colspan="3" class="mailbody empty" id="body_{{ result.id }}"></td>
+            {% endif %}
 	</tr>
     {% endfor %}
     </table>
