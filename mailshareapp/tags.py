@@ -157,8 +157,11 @@ def search_results_to_tag_cloud_html(queryset):
             size = get_tag_cloud_size(frequency, max_freq, min_freq)
             font_size = str(size)
             padding = str(size/4)
-            result += '<span style="font-size: ' + font_size + 'px; padding: ' + padding + 'px;">'
-            result += tag_to_html(tag) + ' '
+            result += '<span style="font-size: ' + font_size + 'px; padding: ' + padding + 'px;"'
+            result += ' title="' + str(frequency) + ' occurrence'
+            if frequency != 1:
+                result += 's'
+            result += '">' + tag_to_html(tag) + ' '
             result += '</span>'
     return result
 
