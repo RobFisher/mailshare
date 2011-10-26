@@ -5,6 +5,7 @@ import math
 from django.utils.html import strip_tags
 from django.db.models import Q
 import models
+import search
 
 def get_or_create_tag(tag_name):
     """Return tag with the specified name, creating it if it doesn't exist."""
@@ -75,8 +76,8 @@ def apply_autotag(tag):
 
 def tag_to_html(t):
     """Render the specified tag as HTML."""
-    result = '<a href="/search/?tag_id='
-    result += str(t.id)
+    tag_search = search.get_tag_id_search(t.id)
+    result = '<a href="' + tag_search.get_url_path()
     result += '">'
     result += t.name
     result += '</a>'
@@ -180,4 +181,3 @@ def search_results_to_tag_cloud_html(queryset):
             result += '">' + tag_to_html(tag) + ' '
             result += '</span>'
     return result
-

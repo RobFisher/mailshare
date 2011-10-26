@@ -1,6 +1,7 @@
 # License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
 
-from mailshareapp.models import Mail
+import models
+import search
 from plaintext import plaintext2html
 from lxml.html.clean import Cleaner
 import lxml.html.defs
@@ -38,7 +39,8 @@ def mail_body_html(mail):
 
 def contact_to_html(contact):
     """Given a mailshareapp.models.Contact object, return a string representing it in HTML."""
-    result = '<a href="/search/?sender=' + str(contact.id)
+    sender_search = search.get_sender_id_search(contact.id)
+    result = '<a href="' + sender_search.get_url_path()
     if contact.name != '':
         result += '" title="' + contact.address + '">' + contact.name + '</a>'
     else:
@@ -59,8 +61,8 @@ def contacts_queryset_to_html(contacts):
 
 def mail_permalink_html(mail):
     """Generate permalink to a mail in HTML."""
-    result = '<a href="/search/?mail_id='
-    result += str(mail.id)
+    mail_search = search.get_mail_id_search(mail.id)
+    result = '<a href="' + mail_search.get_url_path()
     result += '">permalink</a>'
     return result
 
