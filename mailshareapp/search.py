@@ -71,21 +71,45 @@ _parameters_map = {
 
 class Search:
     """Represents a search and can convert between various representations of a search."""
-    def __init__(self, request):
-        """Create a new search object based on the specified request object."""
-        self.query = None;
-        self.html = '';
+    def __init__(self, search_parameters):
+        """
+        Create a new search object with the specified parameters.
+        
+        Arguments:
+        search_parameters -- A list of tuples, where each tuple is a (parameter, value) pair.
 
-        # only handle the first parameter for now
-        request_items = request.GET.items()
-        if len(request_items) > 0:
-            field_name = request_items[0][0]
-            field_value = request_items[0][1]
-            if field_name in _parameters_map:
-                self.query = _parameters_map[field_name].get_query(field_value)
-                self.html = _parameters_map[field_name].get_html(field_value)
+        """
+        self._search_parameters = search_parameters
+        self._query_set = None
+        self._html = None
 
-        if self.query != None:
-            self.results = Mail.objects.filter(self.query)
-        else:
-            self.results = Mail.objects.none()
+
+    def get_query_set(self):
+        """Return a Django query set associated with this search."""
+        if self._query_set == None:
+            q = None
+            # only handle the first parameter for now
+            if len(self._search_parameters) > 0:
+                field_name = self._search_parameters[0][0]
+                field_value = self._search_parameters[0][1]
+                if field_name in _parameters_map:
+                    q = _parameters_map[field_name].get_query(field_value)
+            if q == None:
+                self._query_set = Mail.objects.none()
+            else:
+                self._query_set = Mail.objects.filter(q)
+
+        return self._query_set
+
+
+    def get_html(self):
+        if self._html == None:
+            self._html = ''
+            # only handle the first parameter for now
+            if len(self._search_parameters) > 0:
+                field_name = self._search_parameters[0][0]
+                field_value = self._search_parameters[0][1]
+                if field_name in _parameters_map:
+                    self._html += _parameters_map[field_name].get_html(field_value)
+
+        return self._html

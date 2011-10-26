@@ -49,19 +49,19 @@ def search(request):
     tag_cloud = ''
     expanded_html = ''
     
-    search = Search(request)
+    search = Search(request.GET.items())
 
-    if len(search.results) == 1:
+    if len(search.get_query_set()) == 1:
         expanded_html = get_expanded_html(search.results[0])
-    elif len(search.results) != 0:
-        tag_cloud = tags.search_results_to_tag_cloud_html(search.results)
+    elif len(search.get_query_set()) != 0:
+        tag_cloud = tags.search_results_to_tag_cloud_html(search.get_query_set())
 
     t = loader.get_template('search.html')
     c = RequestContext(request, {
         'search_query': search_query,
-        'search_html': search.html,
+        'search_html': search.get_html(),
         'tag_cloud': tag_cloud,
         'expanded_html': expanded_html,
-        'results' : search.results,
+        'results' : search.get_query_set(),
     })
     return HttpResponse(t.render(c))
