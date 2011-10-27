@@ -5,6 +5,7 @@ from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db.models import Q
 from mailshareapp.models import Mail, Contact, Tag
+from mailshareapp.search import Search
 import email_utils
 import tags
 
@@ -52,23 +53,18 @@ def search(request):
     tag_html = ''
     tag_cloud = ''
     expanded_html = ''
-    results = Mail.objects.all()
-    if search_query != '':
-        results = results.filter(
-            Q(subject__search=search_query) |
-            Q(body__search=search_query))
-    if mail_id != -1:
-        results = results.filter(id=mail_id)
+    
+    search = Search(request)
+
     if sender_id != -1:
-        results = results.filter(sender__id=sender_id)
         try:
             sender = Contact.objects.get(id=sender_id)
         except Contact.DoesNotExist:
             pass
         else:
             sender_html = email_utils.contact_to_html(sender)
+
     if tag_id != -1:
-        results = results.filter(tags__id=tag_id)
         try:
             tag = Tag.objects.get(id=tag_id)
         except Tag.DoesNotExist:
@@ -76,10 +72,10 @@ def search(request):
         else:
             tag_html = tags.tag_to_html(tag)
 
-    if len(results) == 1:
-        expanded_html = get_expanded_html(results[0])
-    elif len(results) != 0:
-        tag_cloud = tags.search_results_to_tag_cloud_html(results)
+    if len(search.results) == 1:
+        expanded_html = get_expanded_html(search.results[0])
+    elif len(search.results) != 0:
+        tag_cloud = tags.search_results_to_tag_cloud_html(search.results)
 
     t = loader.get_template('search.html')
     c = RequestContext(request, {
@@ -88,6 +84,6 @@ def search(request):
         'tag_html': tag_html,
         'tag_cloud': tag_cloud,
         'expanded_html': expanded_html,
-        'results' : results,
+        'results' : search.results,
     })
     return HttpResponse(t.render(c))
