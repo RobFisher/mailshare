@@ -45,32 +45,11 @@ def get_expanded_html(mail):
 
 
 def search(request):
-    mail_id = get_int(request, 'mail_id')
     search_query = get_string(request, 'query')
-    sender_id = get_int(request, 'sender')
-    tag_id = get_int(request, 'tag_id')
-    sender_html = ''
-    tag_html = ''
     tag_cloud = ''
     expanded_html = ''
     
     search = Search(request)
-
-    if sender_id != -1:
-        try:
-            sender = Contact.objects.get(id=sender_id)
-        except Contact.DoesNotExist:
-            pass
-        else:
-            sender_html = email_utils.contact_to_html(sender)
-
-    if tag_id != -1:
-        try:
-            tag = Tag.objects.get(id=tag_id)
-        except Tag.DoesNotExist:
-            pass
-        else:
-            tag_html = tags.tag_to_html(tag)
 
     if len(search.results) == 1:
         expanded_html = get_expanded_html(search.results[0])
@@ -80,8 +59,7 @@ def search(request):
     t = loader.get_template('search.html')
     c = RequestContext(request, {
         'search_query': search_query,
-        'sender_html': sender_html,
-        'tag_html': tag_html,
+        'search_html': search.html,
         'tag_cloud': tag_cloud,
         'expanded_html': expanded_html,
         'results' : search.results,

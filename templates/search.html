@@ -19,14 +19,11 @@
 <input id="submit" type="submit" value="Search" />
 </form>
 
-<div class="search_details">
-{% if sender_html %}
-    <div class="search_sender"><p>Sender is {% autoescape off %}{{ sender_html }}{% endautoescape %}</p></div>
+{% if search_html %}
+    <div class="search_details">
+    {% autoescape off %}{{ search_html }}{% endautoescape %}
+    </div>
 {% endif %}
-{% if tag_html %}
-    <div class="search_tag"><p>Contains tag {% autoescape off %}{{ tag_html }}{% endautoescape %}</p></div>
-{% endif %}
-</div>
 
 {% if tag_cloud %}
     <p>Tag cloud for these results:</p>
