@@ -103,3 +103,19 @@ function tagbox_blur(email_id) {
     $("#tagbox_" + email_id).toggleClass("shown hidden");
     $("#tagbutton_" + email_id).toggleClass("shown hidden");
 }
+
+function delete_mail(email_id) {
+    var answer = confirm("This will permanently delete the email from the Mailshare database.");
+    if(answer) {
+	Dajaxice.mailshare.mailshareapp.delete_email(Dajax.process,{'email_id':email_id});
+    }
+}
+
+function mail_deleted(success) {
+    if(success) {
+	window.location.reload();
+    }
+    else {
+	alert("Unable to delete email.");
+    }
+}

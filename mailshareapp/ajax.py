@@ -1,3 +1,4 @@
+import datetime
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 from mailshareapp.models import Mail, Contact, Tag
@@ -56,4 +57,24 @@ def tag_completion(request, text):
     for tag in tags:
         response.append(tag.name)
     dajax.add_data({'tags':response}, 'set_tag_completion')
+    return dajax.json()
+
+
+@dajaxice_register
+def delete_email(request, email_id):
+    dajax = Dajax()
+    success = False
+    try:
+        mail = Mail.objects.get(id=email_id)
+        f = open('delete_log', 'a')
+        f.write(datetime.datetime.utcnow().isoformat() + ' id: ' + str(mail.id) + ' subject: ' + mail.subject + '\n')
+        f.close()
+    except:
+        pass
+    else:
+        if settings.MAILSHARE_ENABLE_DELETE:
+            mail.delete()
+            success = True
+
+    dajax.add_data({'success':success}, 'mail_deleted')
     return dajax.json()
