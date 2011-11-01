@@ -1,4 +1,5 @@
 import datetime
+import logging
 from dajax.core import Dajax
 from dajaxice.decorators import dajaxice_register
 from mailshareapp.models import Mail, Contact, Tag
@@ -63,12 +64,11 @@ def tag_completion(request, text):
 @dajaxice_register
 def delete_email(request, email_id):
     dajax = Dajax()
+    logger = logging.getLogger('ajax')
     success = False
     try:
         mail = Mail.objects.get(id=email_id)
-        f = open('delete_log', 'a')
-        f.write(datetime.datetime.utcnow().isoformat() + ' id: ' + str(mail.id) + ' subject: ' + mail.subject + '\n')
-        f.close()
+        logger.info('delete_email ' + datetime.datetime.utcnow().isoformat() + ' id: ' + str(mail.id) + ' subject: ' + mail.subject)
     except:
         pass
     else:

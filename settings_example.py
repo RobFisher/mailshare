@@ -172,5 +172,10 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'ajax': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     }
 }
