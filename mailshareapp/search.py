@@ -7,20 +7,25 @@ import tags
 
 
 class _Parameter(object):
-    def __init__(self, value):
+    def __init__(self, value, index):
         self.string_value = value
+        self.index = index
 
 
     def get_url_param(self):
-        return self.parameter_name + '=' + self.string_value
+        url = self.parameter_name
+        if self.index:
+            url += '-' + str(index)
+        url += '=' + self.string_value
+        return url
 
 
 class _FullTextParameter(_Parameter):
     parameter_name = 'query'
 
 
-    def __init__(self, value):
-        super(_FullTextParameter, self).__init__(value)
+    def __init__(self, value, index):
+        super(_FullTextParameter, self).__init__(value, index)
 
 
     def get_query(self):
@@ -35,8 +40,8 @@ class _TagParameter(_Parameter):
     parameter_name = 'tag_id'
 
 
-    def __init__(self, value):
-        super(_TagParameter, self).__init__(value)
+    def __init__(self, value, index):
+        super(_TagParameter, self).__init__(value, index)
         self.tid = int(value)
 
 
@@ -59,8 +64,8 @@ class _ContactParameter(_Parameter):
     parameter_name = 'contact'
 
 
-    def __init__(self, value):
-        super(_ContactParameter, self).__init__(value)
+    def __init__(self, value, index):
+        super(_ContactParameter, self).__init__(value, index)
         self.cid = int(value)
 
 
@@ -126,8 +131,8 @@ class _MailParameter(_Parameter):
     parameter_name = 'mail_id'
 
 
-    def __init__(self, value):
-        super(_MailParameter, self).__init__(value)
+    def __init__(self, value, index):
+        super(_MailParameter, self).__init__(value, index)
         self.mid = int(value)
 
 
@@ -149,6 +154,16 @@ _parameters_map = {
 }
 
 
+def _get_parameter_name_and_index(field_name):
+    parameter_name = field_name
+    index = 0
+    dash_position = field_name.rfind('-')
+    if dash_position != -1:
+        parameter_name = field_name[0:dash_position]
+        index = int(field_name[dash_position+1:])
+    return (parameter_name, index)
+
+
 class Search:
     """Represents a search and can convert between various representations of a search."""
     def __init__(self, search_parameters):
@@ -164,34 +179,50 @@ class Search:
         self._html = None
         self._url_path = None
         self._parameter = None
+        self._and = None
 
-        # Only handle the first parameter for now
+        # handle the first parameter
         if len(self._search_parameters) > 0:
-            field_name = self._search_parameters[0][0]
-            field_value = self._search_parameters[0][1]
-            if field_name in _parameters_map:
-                self._parameter = _parameters_map[field_name](field_value)
+            (parameter_name, parameter_index) = _get_parameter_name_and_index(self._search_parameters[0][0])
+            parameter_value = self._search_parameters[0][1]
+            if parameter_name in _parameters_map:
+                self._parameter = _parameters_map[parameter_name](parameter_value, parameter_index)
+        
+        # handle any remaining parameters
+        if len(self._search_parameters) > 1:
+            self._and = Search(self._search_parameters[1:])
+
+
+    def filter_results(self, results):
+        q = None
+        if self._parameter:
+            q = self._parameter.get_query()
+            if q:
+                results = results.filter(q).distinct()
+            else:
+                results = models.Mail.objects.none()
+
+        if self._and:
+            results = self._and.filter_results(results)
+        return results
 
 
     def get_query_set(self):
         """Return a Django query set associated with this search."""
         if self._query_set == None:
-            q = None
-            if self._parameter:
-                q = self._parameter.get_query()
-            if q == None:
-                self._query_set = models.Mail.objects.none()
-            else:
-                self._query_set = models.Mail.objects.filter(q).distinct()
+            self._query_set = self.filter_results(models.Mail.objects.all())
 
         return self._query_set
 
 
     def get_html(self):
         if self._html == None:
-            self._html = ''
+            self._html = '<p>'
             if self._parameter:
                 self._html += self._parameter.get_html()
+            self._html += '</p>\n'
+            if self._and:
+                self._html += self._and.get_html()
 
         return self._html
 
