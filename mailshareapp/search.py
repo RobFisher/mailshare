@@ -38,15 +38,11 @@ def _get_tag_id_url(i):
     return 'tag_id=' + i
 
 
-def _get_sender_id_query(i):
-    return Q(sender__id=int(i))
-
-
-def _get_sender_id_html(i):
-    sender_id = int(i)
-    html = 'Emails sent by '
+def _get_contact_name_html(i):
+    html = ''
+    cid = int(i)
     try:
-        sender = models.Contact.objects.get(id=sender_id)
+        sender = models.Contact.objects.get(id=cid)
     except models.Contact.DoesNotExist:
         html += 'unknown'
     else:
@@ -54,8 +50,35 @@ def _get_sender_id_html(i):
     return html
 
 
+def _get_sender_id_query(i):
+    return Q(sender__id=int(i))
+
+
+def _get_sender_id_html(i):
+    html = 'Emails sent by '
+    html += _get_contact_name_html(i)
+    html += '[<a href="' + get_contact_id_search(int(i)).get_url_path() + '">to or from</a>]'
+    return html
+
+
 def _get_sender_id_url(i):
     return 'sender=' + i
+
+
+def _get_contact_id_query(i):
+    cid = int(i)
+    return Q(sender__id=cid) | Q(to__id=cid) | Q(cc__id=cid)
+
+
+def _get_contact_id_html(i):
+    html = 'Emails to or from '
+    html += _get_contact_name_html(i)
+    html += '[<a href="' + get_sender_id_search(int(i)).get_url_path() + '">sent</a>]'
+    return html
+
+
+def _get_contact_id_url(i):
+    return 'contact=' + i
 
 
 def _get_mail_id_query(i):
@@ -83,6 +106,7 @@ _parameters_map = {
     'tag_id': _Parameter(_get_tag_id_query, _get_tag_id_html, _get_tag_id_url),
     'sender': _Parameter(_get_sender_id_query, _get_sender_id_html, _get_sender_id_url),
     'mail_id': _Parameter(_get_mail_id_query, _get_mail_id_html, _get_mail_id_url),
+    'contact': _Parameter(_get_contact_id_query, _get_contact_id_html, _get_contact_id_url),
 }
 
 
@@ -115,7 +139,7 @@ class Search:
             if q == None:
                 self._query_set = models.Mail.objects.none()
             else:
-                self._query_set = models.Mail.objects.filter(q)
+                self._query_set = models.Mail.objects.filter(q).distinct()
 
         return self._query_set
 
@@ -156,3 +180,7 @@ def get_sender_id_search(sender_id):
 
 def get_tag_id_search(tag_id):
     return Search([('tag_id', str(tag_id))])
+
+
+def get_contact_id_search(contact_id):
+    return Search([('contact', str(contact_id))])
