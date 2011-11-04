@@ -227,11 +227,18 @@ class Search:
         return self._html
 
 
+    def append_url_parameters(self, url_path):
+        if self._parameter:
+            url_path += self._parameter.get_url_param()
+        if self._and:
+            url_path = self._and.append_url_parameters(url_path)
+        return url_path
+
+
     def get_url_path(self):
         if self._url_path == None:
             self._url_path = '/search/?'
-            if self._parameter:
-                self._url_path += self._parameter.get_url_param()
+            self._url_path = self.append_url_parameters(self._url_path)
 
         return self._url_path
 
