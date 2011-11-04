@@ -6,107 +6,124 @@ import email_utils
 import tags
 
 
-def _get_full_text_query(s):
-    return Q(subject__search=s) | Q(body__search=s)
+class _Parameter(object):
+    def __init__(self, value):
+        self.string_value = value
 
 
-def _get_full_text_html(s):
-    return ''
+    def get_url_param(self):
+        return self.parameter_name + '=' + self.string_value
 
 
-def _get_full_text_url(s):
-    return 'query=' + s
+class _FullTextParameter(_Parameter):
+    parameter_name = 'query'
 
 
-def _get_tag_id_query(i):
-    return Q(tags__id=int(i))
+    def __init__(self, value):
+        super(_FullTextParameter, self).__init__(value)
 
 
-def _get_tag_id_html(i):
-    tag_id = int(i)
-    html = 'Emails with tag '
-    try:
-        tag = models.Tag.objects.get(id=tag_id)
-    except models.Tag.DoesNotExist:
-        html += 'unknown'
-    else:
-        html += tags.tag_to_html(tag)
-    return html
+    def get_query(self):
+        return Q(subject__search=self.string_value) | Q(body__search=self.string_value)
 
 
-def _get_tag_id_url(i):
-    return 'tag_id=' + i
+    def get_html(self):
+        return ''
 
 
-def _get_contact_name_html(i):
-    html = ''
-    cid = int(i)
-    try:
-        sender = models.Contact.objects.get(id=cid)
-    except models.Contact.DoesNotExist:
-        html += 'unknown'
-    else:
-        html += email_utils.contact_to_html(sender)
-    return html
+class _TagParameter(_Parameter):
+    parameter_name = 'tag_id'
 
 
-def _get_sender_id_query(i):
-    return Q(sender__id=int(i))
+    def __init__(self, value):
+        super(_TagParameter, self).__init__(value)
+        self.tid = int(value)
 
 
-def _get_sender_id_html(i):
-    html = 'Emails sent by '
-    html += _get_contact_name_html(i)
-    html += '[<a href="' + get_contact_id_search(int(i)).get_url_path() + '">to or from</a>]'
-    return html
+    def get_query(self):
+        return Q(tags__id=self.tid)
 
 
-def _get_sender_id_url(i):
-    return 'sender=' + i
+    def get_html(self):
+        html = 'Emails with tag '
+        try:
+            tag = models.Tag.objects.get(id=self.tid)
+        except models.Tag.DoesNotExist:
+            html += 'unknown'
+        else:
+            html += tags.tag_to_html(tag)
+        return html
 
 
-def _get_contact_id_query(i):
-    cid = int(i)
-    return Q(sender__id=cid) | Q(to__id=cid) | Q(cc__id=cid)
+class _ContactParameter(_Parameter):
+    parameter_name = 'contact'
 
 
-def _get_contact_id_html(i):
-    html = 'Emails to or from '
-    html += _get_contact_name_html(i)
-    html += '[<a href="' + get_sender_id_search(int(i)).get_url_path() + '">sent</a>]'
-    return html
+    def __init__(self, value):
+        super(_ContactParameter, self).__init__(value)
+        self.cid = int(value)
 
 
-def _get_contact_id_url(i):
-    return 'contact=' + i
+    def _get_contact_name_html(self):
+        html = ''
+        try:
+            sender = models.Contact.objects.get(id=self.cid)
+        except models.Contact.DoesNotExist:
+            html += 'unknown'
+        else:
+            html += email_utils.contact_to_html(sender)
+        return html
 
 
-def _get_mail_id_query(i):
-    return Q(id=int(i))
+    def get_query(self):
+        return Q(sender__id=self.cid) | Q(to__id=self.cid) | Q(cc__id=self.cid)
 
 
-def _get_mail_id_html(i):
-    return ''
+    def get_html(self):
+        html = 'Emails to or from '
+        html += self._get_contact_name_html()
+        html += '[<a href="' + get_sender_id_search(self.cid).get_url_path() + '">sent</a>]'
+        return html
 
 
-def _get_mail_id_url(i):
-    return 'mail_id=' + i
+class _SenderParameter(_ContactParameter):
+    parameter_name = 'sender'
 
 
-class _Parameter:
-    """Operations that can be performed on a search parameter."""
-    def __init__(self, get_query_func, get_html_func, get_url_func):
-        self.get_query = get_query_func
-        self.get_html = get_html_func
-        self.get_url_param = get_url_func
+    def get_query(self):
+        return Q(sender__id=self.cid)
+
+
+    def get_html(self):
+        html = 'Emails sent by '
+        html += self._get_contact_name_html()
+        html += '[<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
+        return html
+
+
+class _MailParameter(_Parameter):
+    parameter_name = 'mail_id'
+
+
+    def __init__(self, value):
+        super(_MailParameter, self).__init__(value)
+        self.mid = int(value)
+
+
+    def get_query(self):
+        return Q(id=self.mid)
+
+
+    def get_html(self):
+        return ''
 
 
 _parameters_map = {
-    'query': _Parameter(_get_full_text_query, _get_full_text_html, _get_full_text_url),
-    'tag_id': _Parameter(_get_tag_id_query, _get_tag_id_html, _get_tag_id_url),
-    'sender': _Parameter(_get_sender_id_query, _get_sender_id_html, _get_sender_id_url),
-    'mail_id': _Parameter(_get_mail_id_query, _get_mail_id_html, _get_mail_id_url),
-    'contact': _Parameter(_get_contact_id_query, _get_contact_id_html, _get_contact_id_url),
+    _FullTextParameter.parameter_name: _FullTextParameter,
+    _TagParameter.parameter_name: _TagParameter,
+    _ContactParameter.parameter_name: _ContactParameter,
+    _SenderParameter.parameter_name: _SenderParameter,
+    _MailParameter.parameter_name: _MailParameter,
 }
 
 
@@ -124,18 +141,22 @@ class Search:
         self._query_set = None
         self._html = None
         self._url_path = None
+        self._paremeter = None
+
+        # Only handle the first parameter for now
+        if len(self._search_parameters) > 0:
+            field_name = self._search_parameters[0][0]
+            field_value = self._search_parameters[0][1]
+            if field_name in _parameters_map:
+                self._parameter = _parameters_map[field_name](field_value)
 
 
     def get_query_set(self):
         """Return a Django query set associated with this search."""
         if self._query_set == None:
             q = None
-            # only handle the first parameter for now
-            if len(self._search_parameters) > 0:
-                field_name = self._search_parameters[0][0]
-                field_value = self._search_parameters[0][1]
-                if field_name in _parameters_map:
-                    q = _parameters_map[field_name].get_query(field_value)
+            if self._parameter:
+                q = self._parameter.get_query()
             if q == None:
                 self._query_set = models.Mail.objects.none()
             else:
@@ -147,12 +168,8 @@ class Search:
     def get_html(self):
         if self._html == None:
             self._html = ''
-            # only handle the first parameter for now
-            if len(self._search_parameters) > 0:
-                field_name = self._search_parameters[0][0]
-                field_value = self._search_parameters[0][1]
-                if field_name in _parameters_map:
-                    self._html += _parameters_map[field_name].get_html(field_value)
+            if self._parameter:
+                self._html += self._parameter.get_html()
 
         return self._html
 
@@ -160,12 +177,8 @@ class Search:
     def get_url_path(self):
         if self._url_path == None:
             self._url_path = '/search/?'
-            # only handle the first parameter for now
-            if len(self._search_parameters) > 0:
-                field_name = self._search_parameters[0][0]
-                field_value = self._search_parameters[0][1]
-                if field_name in _parameters_map:
-                    self._url_path += _parameters_map[field_name].get_url_param(field_value)
+            if self._parameter:
+                self._url_path += self._parameter.get_url_param()
 
         return self._url_path
 
