@@ -1,6 +1,7 @@
 *.pyc
 settings.py
 mailfile
+delete_log
 *~
 \#*\#
 .\#*

@@ -26,6 +26,7 @@ MAILSHARE_IMAP_USER = ''
 MAILSHARE_IMAP_PASSWORD = ''
 MAILSHARE_IMAP_MAILBOX = 'INBOX'
 MAILSHARE_IMAP_ENABLE_EXPUNGE = False
+MAILSHARE_ENABLE_DELETE = False
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -167,6 +168,11 @@ LOGGING = {
             'propagate': True,
         },
         'dajaxice': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'ajax': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,

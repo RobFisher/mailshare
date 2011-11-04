@@ -6,6 +6,7 @@ from plaintext import plaintext2html
 from lxml.html.clean import Cleaner
 import lxml.html.defs
 import re
+from django.conf import settings
 
 outlook_otags = re.compile('</*o:p>')
 
@@ -67,10 +68,18 @@ def mail_permalink_html(mail):
     return result
 
 
+def mail_delete_html(mail):
+    """Generate delete link for a mail in HTML."""
+    result = '<a href="#" onclick="delete_mail(' + str(mail.id) + '); return false;">delete</a>'
+    return result
+
+
 def mail_contacts_bar_html(mail):
     """Given a mailshareapp.models.Mail object, generate the contacts bar in HTML."""
     result = '<div class="recipients"><p style="float:left;">From: '
     result += contact_to_html(mail.sender) + '</p><p style="float:right;">'
+    if settings.MAILSHARE_ENABLE_DELETE:
+        result += mail_delete_html(mail) + ' | '
     result += mail_permalink_html(mail) + '</p><div style="clear:both;"></div>'
     result += 'To: '
     result += contacts_queryset_to_html(mail.to.all())
