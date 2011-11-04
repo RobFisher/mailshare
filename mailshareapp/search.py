@@ -82,7 +82,9 @@ class _ContactParameter(_Parameter):
     def get_html(self):
         html = 'Emails to or from '
         html += self._get_contact_name_html()
-        html += '[<a href="' + get_sender_id_search(self.cid).get_url_path() + '">sent</a>]'
+        html += '[<a href="' + get_recipient_id_search(self.cid).get_url_path() + '">to</a>'
+        html += '|<a href="' + get_sender_id_search(self.cid).get_url_path() + '">from</a>'
+        html += '|to or from]'
         return html
 
 
@@ -95,9 +97,28 @@ class _SenderParameter(_ContactParameter):
 
 
     def get_html(self):
-        html = 'Emails sent by '
+        html = 'Emails from '
         html += self._get_contact_name_html()
-        html += '[<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
+        html += '[<a href="' + get_recipient_id_search(self.cid).get_url_path() + '">to</a>'
+        html += '|from'
+        html += '|<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
+        return html
+
+
+class _RecipientParameter(_ContactParameter):
+    parameter_name = 'recipient'
+
+
+    def get_query(self):
+        return Q(to__id=self.cid)
+
+
+    def get_html(self):
+        html = 'Emails to '
+        html += self._get_contact_name_html()
+        html += '[to'
+        html += '|<a href="' + get_sender_id_search(self.cid).get_url_path() + '">from</a>'
+        html += '|<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
         return html
 
 
@@ -123,6 +144,7 @@ _parameters_map = {
     _TagParameter.parameter_name: _TagParameter,
     _ContactParameter.parameter_name: _ContactParameter,
     _SenderParameter.parameter_name: _SenderParameter,
+    _RecipientParameter.parameter_name: _RecipientParameter,
     _MailParameter.parameter_name: _MailParameter,
 }
 
@@ -141,7 +163,7 @@ class Search:
         self._query_set = None
         self._html = None
         self._url_path = None
-        self._paremeter = None
+        self._parameter = None
 
         # Only handle the first parameter for now
         if len(self._search_parameters) > 0:
@@ -197,3 +219,7 @@ def get_tag_id_search(tag_id):
 
 def get_contact_id_search(contact_id):
     return Search([('contact', str(contact_id))])
+
+
+def get_recipient_id_search(contact_id):
+    return Search([('recipient', str(contact_id))])
