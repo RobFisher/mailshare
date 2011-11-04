@@ -15,7 +15,7 @@ class _Parameter(object):
     def get_url_param(self):
         url = self.parameter_name
         if self.index:
-            url += '-' + str(index)
+            url += '-' + str(self.index)
         url += '=' + self.string_value
         return url
 
@@ -231,6 +231,7 @@ class Search:
         if self._parameter:
             url_path += self._parameter.get_url_param()
         if self._and:
+            url_path += '&'
             url_path = self._and.append_url_parameters(url_path)
         return url_path
 
@@ -241,6 +242,27 @@ class Search:
             self._url_path = self.append_url_parameters(self._url_path)
 
         return self._url_path
+
+
+    def _copy(self):
+        new_search = Search([(self._parameter.parameter_name + '-' + str(self._parameter.index), self._parameter.string_value)])
+        if self._and:
+            new_search._and = self._and._copy()
+        return new_search
+
+
+    def add_and(self, search):
+        new_search = self._copy()
+        new_search._add_and(search)
+        return new_search
+
+
+    def _add_and(self, search):
+        if self._and:
+            self._and._add_and(search)
+        else:
+            search._parameter.index = self._parameter.index + 1
+            self._and = search
 
 
 def get_mail_id_search(mail_id):

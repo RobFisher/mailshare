@@ -74,9 +74,11 @@ def apply_autotag(tag):
         m.tags.add(tag)
 
 
-def tag_to_html(t):
+def tag_to_html(t, s=None):
     """Render the specified tag as HTML."""
     tag_search = search.get_tag_id_search(t.id)
+    if s:
+        tag_search = s.add_and(tag_search)
     result = '<a href="' + tag_search.get_url_path()
     result += '">'
     result += t.name
@@ -163,7 +165,7 @@ def get_tag_cloud_size(freq, max_freq, min_freq):
     return int(font_size)
 
 
-def search_results_to_tag_cloud_html(queryset):
+def search_results_to_tag_cloud_html(queryset, search=None):
     """Given a queryset containing Mail objects, return a tag cloud rendered in HTML"""
     result = ''
     h = build_tags_histogram(queryset)
@@ -178,6 +180,6 @@ def search_results_to_tag_cloud_html(queryset):
             result += ' title="' + str(frequency) + ' occurrence'
             if frequency != 1:
                 result += 's'
-            result += '">' + tag_to_html(tag) + ' '
+            result += '">' + tag_to_html(tag, search) + ' '
             result += '</span>'
     return result

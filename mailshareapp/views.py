@@ -54,7 +54,7 @@ def search(request):
     if len(search.get_query_set()) == 1:
         expanded_html = get_expanded_html(search.get_query_set()[0])
     elif len(search.get_query_set()) != 0:
-        tag_cloud = tags.search_results_to_tag_cloud_html(search.get_query_set())
+        tag_cloud = tags.search_results_to_tag_cloud_html(search.get_query_set(), search)
 
     t = loader.get_template('search.html')
     c = RequestContext(request, {
