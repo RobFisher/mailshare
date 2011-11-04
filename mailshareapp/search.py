@@ -257,11 +257,13 @@ class Search:
         return new_search
 
 
-    def _add_and(self, search):
+    def _add_and(self, search, highest_index=0):
+        if self._parameter.index > highest_index:
+            highest_index = self._parameter.index
         if self._and:
-            self._and._add_and(search)
+            self._and._add_and(search, highest_index)
         else:
-            search._parameter.index = self._parameter.index + 1
+            search._parameter.index = highest_index + 1
             self._and = search
 
 
