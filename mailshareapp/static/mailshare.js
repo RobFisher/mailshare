@@ -72,7 +72,7 @@ function add_tag(email_id) {
 }
 
 function add_tag_to_email(email_id, text) {
-    Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':text});
+    Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':text, 'url':location.href});
 }
 
 function delete_tag(email_id, tag_id) {

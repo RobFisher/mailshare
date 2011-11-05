@@ -21,13 +21,14 @@ def expand_email(request, email_id, url):
 
 
 @dajaxice_register
-def add_tag(request, email_id, tag):
+def add_tag(request, email_id, tag, url):
     dajax = Dajax()
+    search_object = search.get_search_from_url(url)
     mails = Mail.objects.filter(id=email_id)
     if len(mails) > 0:
         t = tags.get_or_create_tag(tag)
         mails[0].tags.add(t)
-    tags_html = tags.mail_tags_to_html_list(mails[0])
+    tags_html = tags.mail_tags_to_html_list(mails[0], search_object)
     dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
     return dajax.json()
 
