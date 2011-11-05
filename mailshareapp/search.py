@@ -7,9 +7,10 @@ import tags
 
 
 class _Parameter(object):
-    def __init__(self, value, index):
+    def __init__(self, value, index, search):
         self.string_value = value
         self.index = index
+        self.search = search
 
 
     def get_url_param(self):
@@ -20,12 +21,22 @@ class _Parameter(object):
         return url
 
 
+    def get_remove_html(self):
+        html = ''
+        removal_search = self.search.remove_parameter(self.parameter_name, self.string_value)
+        if removal_search:
+            html += '[<a href="'
+            html += removal_search.get_url_path()
+            html += '">x</a>]'
+        return html
+
+
 class _FullTextParameter(_Parameter):
     parameter_name = 'query'
 
 
-    def __init__(self, value, index):
-        super(_FullTextParameter, self).__init__(value, index)
+    def __init__(self, value, index, search):
+        super(_FullTextParameter, self).__init__(value, index, search)
 
 
     def get_query(self):
@@ -40,8 +51,8 @@ class _TagParameter(_Parameter):
     parameter_name = 'tag_id'
 
 
-    def __init__(self, value, index):
-        super(_TagParameter, self).__init__(value, index)
+    def __init__(self, value, index, search):
+        super(_TagParameter, self).__init__(value, index, search)
         self.tid = int(value)
 
 
@@ -57,6 +68,7 @@ class _TagParameter(_Parameter):
             html += 'unknown'
         else:
             html += tags.tag_to_html(tag)
+        html += self.get_remove_html()
         return html
 
 
@@ -64,8 +76,8 @@ class _ContactParameter(_Parameter):
     parameter_name = 'contact'
 
 
-    def __init__(self, value, index):
-        super(_ContactParameter, self).__init__(value, index)
+    def __init__(self, value, index, search):
+        super(_ContactParameter, self).__init__(value, index, search)
         self.cid = int(value)
 
 
@@ -90,6 +102,7 @@ class _ContactParameter(_Parameter):
         html += '[<a href="' + get_recipient_id_search(self.cid).get_url_path() + '">to</a>'
         html += '|<a href="' + get_sender_id_search(self.cid).get_url_path() + '">from</a>'
         html += '|to or from]'
+        html += self.get_remove_html()
         return html
 
 
@@ -107,6 +120,7 @@ class _SenderParameter(_ContactParameter):
         html += '[<a href="' + get_recipient_id_search(self.cid).get_url_path() + '">to</a>'
         html += '|from'
         html += '|<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
+        html += self.get_remove_html()
         return html
 
 
@@ -124,6 +138,7 @@ class _RecipientParameter(_ContactParameter):
         html += '[to'
         html += '|<a href="' + get_sender_id_search(self.cid).get_url_path() + '">from</a>'
         html += '|<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
+        html += self.get_remove_html()
         return html
 
 
@@ -131,8 +146,8 @@ class _MailParameter(_Parameter):
     parameter_name = 'mail_id'
 
 
-    def __init__(self, value, index):
-        super(_MailParameter, self).__init__(value, index)
+    def __init__(self, value, index, search):
+        super(_MailParameter, self).__init__(value, index, search)
         self.mid = int(value)
 
 
@@ -166,7 +181,7 @@ def _get_parameter_name_and_index(field_name):
 
 class Search:
     """Represents a search and can convert between various representations of a search."""
-    def __init__(self, search_parameters):
+    def __init__(self, search_parameters, root_search=None):
         """
         Create a new search object with the specified parameters.
         
@@ -181,16 +196,21 @@ class Search:
         self._parameter = None
         self._and = None
 
+        if root_search == None:
+            self.root_search = self
+        else:
+            self.root_search = root_search
+
         # handle the first parameter
         if len(self._search_parameters) > 0:
             (parameter_name, parameter_index) = _get_parameter_name_and_index(self._search_parameters[0][0])
             parameter_value = self._search_parameters[0][1]
             if parameter_name in _parameters_map:
-                self._parameter = _parameters_map[parameter_name](parameter_value, parameter_index)
+                self._parameter = _parameters_map[parameter_name](parameter_value, parameter_index, self.root_search)
         
         # handle any remaining parameters
         if len(self._search_parameters) > 1:
-            self._and = Search(self._search_parameters[1:])
+            self._and = Search(self._search_parameters[1:], self.root_search)
 
 
     def filter_results(self, results):
@@ -265,6 +285,26 @@ class Search:
         else:
             search._parameter.index = highest_index + 1
             self._and = search
+
+
+    def remove_parameter(self, name, value):
+        new_search = self._copy()
+        new_search = new_search._remove_parameter(name, value)
+        return new_search
+
+
+    def _remove_parameter(self, name, value):
+        if name == self._parameter.parameter_name and \
+                value == self._parameter.string_value:
+            return self._and
+        if self._and:
+            if name == self._and._parameter.parameter_name and \
+                    value == self._and._parameter.string_value:
+                self._and = self._and._and
+                return self
+            else:
+                return self._and._remove_parameter(name, value)
+        return self
 
 
 def get_mail_id_search(mail_id):
