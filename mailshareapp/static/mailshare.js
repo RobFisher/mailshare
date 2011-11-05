@@ -40,7 +40,7 @@ function toggle_email_body(email_id) {
 }
 
 function fetch_email(email_id) {
-    Dajaxice.mailshare.mailshareapp.expand_email(Dajax.process,{'email_id':email_id})
+    Dajaxice.mailshare.mailshareapp.expand_email(Dajax.process,{'email_id':email_id,'url':location.href})
 }
 
 function set_email_body(data) {

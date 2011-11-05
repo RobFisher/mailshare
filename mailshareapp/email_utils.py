@@ -38,9 +38,11 @@ def mail_body_html(mail):
         return plaintext2html(mail.body)
 
 
-def contact_to_html(contact):
+def contact_to_html(contact, search_object=None):
     """Given a mailshareapp.models.Contact object, return a string representing it in HTML."""
     sender_search = search.get_sender_id_search(contact.id)
+    if search_object:
+        sender_search = search_object.add_and(sender_search)
     result = '<a href="' + sender_search.get_url_path()
     if contact.name != '':
         result += '" title="' + contact.address + '">' + contact.name + '</a>'
@@ -49,14 +51,14 @@ def contact_to_html(contact):
     return result
 
 
-def contacts_queryset_to_html(contacts):
+def contacts_queryset_to_html(contacts, search_object):
     """Given a QuerySet of contacts, return a string representing them in HTML."""
     if len(contacts) == 0:
         return ''
-    result = contact_to_html(contacts[0])
+    result = contact_to_html(contacts[0], search_object)
     for contact in contacts[1:]:
         result += ', '
-        result += contact_to_html(contact)
+        result += contact_to_html(contact, search_object)
     return result
 
 
@@ -74,16 +76,16 @@ def mail_delete_html(mail):
     return result
 
 
-def mail_contacts_bar_html(mail):
+def mail_contacts_bar_html(mail, search_object):
     """Given a mailshareapp.models.Mail object, generate the contacts bar in HTML."""
     result = '<div class="recipients"><p style="float:left;">From: '
-    result += contact_to_html(mail.sender) + '</p><p style="float:right;">'
+    result += contact_to_html(mail.sender, search_object) + '</p><p style="float:right;">'
     if settings.MAILSHARE_ENABLE_DELETE:
         result += mail_delete_html(mail) + ' | '
     result += mail_permalink_html(mail) + '</p><div style="clear:both;"></div>'
     result += 'To: '
-    result += contacts_queryset_to_html(mail.to.all())
+    result += contacts_queryset_to_html(mail.to.all(), search_object)
     result += '<br />Cc: '
-    result += contacts_queryset_to_html(mail.cc.all())
+    result += contacts_queryset_to_html(mail.cc.all(), search_object)
     result += '</p></div>'
     return result

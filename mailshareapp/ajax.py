@@ -6,14 +6,16 @@ from mailshareapp.models import Mail, Contact, Tag
 from email_utils import *
 from views import get_expanded_html
 import tags
+import search
 
 @dajaxice_register
-def expand_email(request, email_id):
+def expand_email(request, email_id, url):
     dajax = Dajax()
+    search_object = search.get_search_from_url(url)
     email_body = 'Error retrieving email'
     email = Mail.objects.get(pk=email_id)
     if(email):
-        email_body=get_expanded_html(email)
+        email_body=get_expanded_html(email, search_object)
     dajax.add_data({'email_id':email_id, 'email_body':email_body}, 'set_email_body')
     return dajax.json()
 

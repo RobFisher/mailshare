@@ -1,6 +1,7 @@
 """Module to define the Search class."""
 
 from django.db.models import Q
+from django.http import QueryDict
 import models
 import email_utils
 import tags
@@ -325,3 +326,9 @@ def get_contact_id_search(contact_id):
 
 def get_recipient_id_search(contact_id):
     return Search([('recipient', str(contact_id))])
+
+
+def get_search_from_url(url):
+    url_parameters = url[url.rfind('?')+1:]
+    qd = QueryDict(url_parameters)
+    return Search(qd.items())

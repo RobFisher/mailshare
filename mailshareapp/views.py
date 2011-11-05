@@ -36,10 +36,10 @@ def get_int(request, parameter):
     return result
 
 
-def get_expanded_html(mail):
+def get_expanded_html(mail, search=None):
     """Return the HTML representing the expanded email."""
-    expanded_html = email_utils.mail_contacts_bar_html(mail)
-    expanded_html += tags.mail_tags_bar_html(mail)
+    expanded_html = email_utils.mail_contacts_bar_html(mail, search)
+    expanded_html += tags.mail_tags_bar_html(mail, search)
     expanded_html += email_utils.mail_body_html(mail)
     return expanded_html
 
@@ -52,7 +52,7 @@ def search(request):
     search = Search(request.GET.items())
 
     if len(search.get_query_set()) == 1:
-        expanded_html = get_expanded_html(search.get_query_set()[0])
+        expanded_html = get_expanded_html(search.get_query_set()[0], search)
     elif len(search.get_query_set()) != 0:
         tag_cloud = tags.search_results_to_tag_cloud_html(search.get_query_set(), search)
 

@@ -100,23 +100,23 @@ def undo_delete_html(m, t):
     return result
 
 
-def mail_tags_to_html_list(m):
+def mail_tags_to_html_list(m, search_object):
     result = ''
     tags = m.tags.all()
     if len(tags) > 0:
-        result += tag_to_html(tags[0])
+        result += tag_to_html(tags[0], search_object)
         result += tag_to_delete_html(m, tags[0])
     for t in tags[1:]:
         result += ', '
-        result += tag_to_html(t)
+        result += tag_to_html(t, search_object)
         result += tag_to_delete_html(m, t)
     return result
 
 
-def mail_tags_bar_html(m):
+def mail_tags_bar_html(m, search_object):
     """Generate tags bar for mail in HTML."""
     result = '<div class="tags"><p>Tags: <span id="taglist_' + str(m.id)  + '">'
-    result += mail_tags_to_html_list(m) + '</span>'
+    result += mail_tags_to_html_list(m, search_object) + '</span>'
     result += '<input class="hidden" id="tagbox_' + str(m.id)
     result += '" onkeypress="tag_key(event, ' + str(m.id)
     result += ')" onblur="tagbox_blur(' + str(m.id) + ')" />'
