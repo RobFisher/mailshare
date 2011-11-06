@@ -304,7 +304,7 @@ class Search:
                 self._and = self._and._and
                 return self
             else:
-                return self._and._remove_parameter(name, value)
+                self._and._remove_parameter(name, value)
         return self
 
 
