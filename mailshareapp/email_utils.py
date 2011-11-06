@@ -40,7 +40,7 @@ def mail_body_html(mail):
 
 def contact_to_html(contact, search_object=None):
     """Given a mailshareapp.models.Contact object, return a string representing it in HTML."""
-    sender_search = search.get_sender_id_search(contact.id)
+    sender_search = search.get_contact_id_search(contact.id)
     if search_object:
         sender_search = search_object.add_and(sender_search)
     result = '<a href="' + sender_search.get_url_path()
