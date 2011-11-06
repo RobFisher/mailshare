@@ -93,6 +93,14 @@ class _ContactParameter(_Parameter):
         return html
 
 
+    def _get_option_link_html(self, option_search, option_text):
+        html = '<a href="'
+        new_search = self.search.replace_parameter(self, option_search._parameter)
+        html += new_search.get_url_path()
+        html += '">' + option_text + '</a>'
+        return html
+
+
     def get_query(self):
         return Q(sender__id=self.cid) | Q(to__id=self.cid) | Q(cc__id=self.cid)
 
@@ -100,8 +108,8 @@ class _ContactParameter(_Parameter):
     def get_html(self):
         html = 'Emails to or from '
         html += self._get_contact_name_html()
-        html += '[<a href="' + get_recipient_id_search(self.cid).get_url_path() + '">to</a>'
-        html += '|<a href="' + get_sender_id_search(self.cid).get_url_path() + '">from</a>'
+        html += '[' + self._get_option_link_html(get_recipient_id_search(self.cid), 'to')
+        html += '|' + self._get_option_link_html(get_sender_id_search(self.cid), 'from')
         html += '|to or from]'
         html += self.get_remove_html()
         return html
@@ -118,9 +126,11 @@ class _SenderParameter(_ContactParameter):
     def get_html(self):
         html = 'Emails from '
         html += self._get_contact_name_html()
-        html += '[<a href="' + get_recipient_id_search(self.cid).get_url_path() + '">to</a>'
+        html += '[' + self._get_option_link_html(get_recipient_id_search(self.cid), 'to')
         html += '|from'
-        html += '|<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
+        html += '|' + self._get_option_link_html(get_contact_id_search(self.cid), 'to or from')
+        html += ']'
+
         html += self.get_remove_html()
         return html
 
@@ -137,8 +147,10 @@ class _RecipientParameter(_ContactParameter):
         html = 'Emails to '
         html += self._get_contact_name_html()
         html += '[to'
-        html += '|<a href="' + get_sender_id_search(self.cid).get_url_path() + '">from</a>'
-        html += '|<a href="' + get_contact_id_search(self.cid).get_url_path() + '">to or from</a>]'
+        html += '|' + self._get_option_link_html(get_sender_id_search(self.cid), 'from')
+        html += '|' + self._get_option_link_html(get_contact_id_search(self.cid), 'to or from')
+        html += ']'
+
         html += self.get_remove_html()
         return html
 
@@ -190,7 +202,6 @@ class Search:
         search_parameters -- A list of tuples, where each tuple is a (parameter, value) pair.
 
         """
-        self._search_parameters = search_parameters
         self._query_set = None
         self._html = None
         self._url_path = None
@@ -203,15 +214,15 @@ class Search:
             self.root_search = root_search
 
         # handle the first parameter
-        if len(self._search_parameters) > 0:
-            (parameter_name, parameter_index) = _get_parameter_name_and_index(self._search_parameters[0][0])
-            parameter_value = self._search_parameters[0][1]
+        if len(search_parameters) > 0:
+            (parameter_name, parameter_index) = _get_parameter_name_and_index(search_parameters[0][0])
+            parameter_value = search_parameters[0][1]
             if parameter_name in _parameters_map:
                 self._parameter = _parameters_map[parameter_name](parameter_value, parameter_index, self.root_search)
         
         # handle any remaining parameters
-        if len(self._search_parameters) > 1:
-            self._and = Search(self._search_parameters[1:], self.root_search)
+        if len(search_parameters) > 1:
+            self._and = Search(search_parameters[1:], self.root_search)
 
 
     def filter_results(self, results):
@@ -306,6 +317,22 @@ class Search:
             else:
                 self._and._remove_parameter(name, value)
         return self
+
+
+    def replace_parameter(self, old_parameter, new_parameter):
+        new_search = self._copy()
+        new_search._replace_parameter( \
+            old_parameter, new_parameter.parameter_name, new_parameter.string_value, \
+                old_parameter.index)
+        return new_search
+
+
+    def _replace_parameter(self, old_parameter, name, value, index):
+        if old_parameter.index == self._parameter.index:
+            new_parameter = _parameters_map[name](value, index, self.root_search)
+            self._parameter = new_parameter
+        elif self._and:
+            self._and._replace_parameter(old_parameter, name, value, index)
 
 
 def get_mail_id_search(mail_id):
