@@ -13,12 +13,16 @@ class _Parameter(object):
         self.index = index
         self.search = search
 
-
-    def get_url_param(self):
+    
+    def get_url_parameter_name(self):
         url = self.parameter_name
         if self.index:
             url += '-' + str(self.index)
-        url += '=' + self.string_value
+        return url
+
+
+    def get_url_param(self):
+        url = self.get_url_parameter_name() + '=' + self.string_value
         return url
 
 
@@ -29,6 +33,15 @@ class _Parameter(object):
             html += '[<a href="'
             html += removal_search.get_url_path()
             html += '">x</a>]'
+        return html
+
+
+    def get_hidden_form_html(self):
+        html = '<input type="hidden" name="'
+        html += self.get_url_parameter_name()
+        html += '" value="'
+        html += self.string_value
+        html += '" />'
         return html
 
 
@@ -208,13 +221,13 @@ class Search:
         """
         self._query_set = None
         self._html = None
+        self._hidden_form_html = None
         self._url_path = None
         self._parameter = None
         self._and = None
+        self.root_search = self
 
-        if root_search == None:
-            self.root_search = self
-        else:
+        if root_search != None:
             self.root_search = root_search
 
         # handle the first parameter
@@ -263,6 +276,22 @@ class Search:
         return self._html
 
 
+    def get_hidden_form_html(self):
+        if self._hidden_form_html == None:
+            self._hidden_form_html = ''
+            if self._parameter:
+                self._hidden_form_html += self._parameter.get_hidden_form_html()
+            if self._and:
+                self._hidden_form_html += self._and.get_hidden_form_html()
+
+        return self._hidden_form_html
+
+
+    def get_form_query_name(self):
+        next_index = self.get_highest_index() + 1
+        return 'query-' + str(next_index)
+
+
     def append_url_parameters(self, url_path):
         if self._parameter:
             url_path += self._parameter.get_url_param()
@@ -280,10 +309,11 @@ class Search:
         return self._url_path
 
 
-    def _copy(self):
-        new_search = Search([(self._parameter.parameter_name + '-' + str(self._parameter.index), self._parameter.string_value)])
+    def _copy(self, root_search=None):
+        new_search = Search( \
+            [(self._parameter.parameter_name + '-' + str(self._parameter.index), self._parameter.string_value)], root_search)
         if self._and:
-            new_search._and = self._and._copy()
+            new_search._and = self._and._copy(new_search.root_search)
         return new_search
 
 
@@ -293,13 +323,13 @@ class Search:
         return new_search
 
 
-    def _add_and(self, search, highest_index=0):
-        if self._parameter.index > highest_index:
-            highest_index = self._parameter.index
+    def _add_and(self, search):
         if self._and:
-            self._and._add_and(search, highest_index)
+            self._and._add_and(search)
         else:
+            highest_index = self.get_highest_index()
             search._parameter.index = highest_index + 1
+            search.root_search = self.root_search
             self._and = search
 
 
@@ -337,6 +367,18 @@ class Search:
             self._parameter = new_parameter
         elif self._and:
             self._and._replace_parameter(old_parameter, name, value, index)
+
+
+    def get_highest_index(self):
+        return self.root_search._get_highest_index()
+
+
+    def _get_highest_index(self, highest_so_far=0):
+        if self._parameter.index > highest_so_far:
+            highest_so_far = self._parameter.index
+        if self._and:
+            highest_so_far = self._and._get_highest_index(highest_so_far)
+        return highest_so_far
 
 
 def get_mail_id_search(mail_id):

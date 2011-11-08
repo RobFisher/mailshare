@@ -58,7 +58,8 @@ def search(request):
 
     t = loader.get_template('search.html')
     c = RequestContext(request, {
-        'search_query': search_query,
+        'query_name': search.get_form_query_name(),
+        'hidden_form': search.get_hidden_form_html(),
         'search_html': search.get_html(),
         'tag_cloud': tag_cloud,
         'expanded_html': expanded_html,

@@ -15,7 +15,10 @@
 <body>
 <h1><a href="/">Mailshare Search</a></h1>
 <form action="/search/" name="search" method="GET">
-<input id="query" name="query" value="{{ search_query }}" />
+<input id="query" name="{{ query_name }}" value="" />
+{% if hidden_form %}
+    {% autoescape off %}{{ hidden_form }}{% endautoescape %}
+{% endif %}
 <input id="submit" type="submit" value="Search" />
 </form>
 
