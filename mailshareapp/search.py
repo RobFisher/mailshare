@@ -45,7 +45,9 @@ class _FullTextParameter(_Parameter):
 
 
     def get_html(self):
-        return ''
+        html = 'Emails matching text query: ' + self.string_value
+        html += self.get_remove_html()
+        return html
 
 
 class _TagParameter(_Parameter):
@@ -169,7 +171,9 @@ class _MailParameter(_Parameter):
 
 
     def get_html(self):
-        return ''
+        html = 'Email with unique id ' + self.string_value
+        html += self.get_remove_html()
+        return html
 
 
 _parameters_map = {
