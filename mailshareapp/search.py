@@ -482,37 +482,37 @@ class Search:
 
 def get_full_text_search(query):
     """Return a new Search object representing a full text search for the specified string."""
-    return Search([('query', query)])
+    return Search([(_FullTextParameter.parameter_name, query)])
 
 
 def get_mail_id_search(mail_id):
     """Return a new Search object representing a search for a mail with the specified id."""
-    return Search([('mail_id', str(mail_id))])
+    return Search([(_MailParameter.parameter_name, str(mail_id))])
 
 
 def get_sender_id_search(sender_id):
     """Return a new Search object representing a search for mails with the specified sender."""
-    return Search([('sender', str(sender_id))])
+    return Search([(_SenderParameter.parameter_name, str(sender_id))])
 
 
 def get_tag_id_search(tag_id):
     """Return a new Search object representing a search for mails with the specified tag."""
-    return Search([('tag_id', str(tag_id))])
+    return Search([(_TagParameter.parameter_name, str(tag_id))])
 
 
 def get_ntag_id_search(tag_id):
     """Return a new Search object representing a search for mails that do not have the specified tag."""
-    return Search([('ntag_id', str(tag_id))])
+    return Search([(_NotTagParameter.parameter_name, str(tag_id))])
 
 
 def get_contact_id_search(contact_id):
     """Return a new Search object representing a search for mails sent or received by the specified contact."""
-    return Search([('contact', str(contact_id))])
+    return Search([(_ContactParameter.parameter_name, str(contact_id))])
 
 
 def get_recipient_id_search(contact_id):
     """Return a new Search object representing a search for mails received by the specified contact."""
-    return Search([('recipient', str(contact_id))])
+    return Search([(_RecipientParameter.parameter_name, str(contact_id))])
 
 
 def get_search_from_url(url):
