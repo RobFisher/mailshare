@@ -66,7 +66,9 @@ class _FullTextParameter(_Parameter):
 
 
     def get_html(self):
-        html = 'Emails matching text query: ' + self.string_value
+        html = 'Emails matching text query: <a href="'
+        html += get_full_text_search(self.string_value).get_url_path()
+        html += '">' + self.string_value + '</a>'
         html += ' ' + self.get_remove_html()
         return html
 
@@ -419,6 +421,10 @@ class Search:
         if self._and:
             highest_so_far = self._and._get_highest_index(highest_so_far)
         return highest_so_far
+
+
+def get_full_text_search(query):
+    return Search([('query', query)])
 
 
 def get_mail_id_search(mail_id):
