@@ -67,7 +67,7 @@ class _FullTextParameter(_Parameter):
 
     def get_html(self):
         html = 'Emails matching text query: ' + self.string_value
-        html += self.get_remove_html()
+        html += ' ' + self.get_remove_html()
         return html
 
 
@@ -97,7 +97,7 @@ class _TagParameter(_Parameter):
     def get_html(self):
         html = 'Emails with tag '
         html += self.get_tag_name_html()
-        html += '[with|' + self.get_option_link_html(get_ntag_id_search(self.tid), 'without') + ']'
+        html += '<br />[with|' + self.get_option_link_html(get_ntag_id_search(self.tid), 'without') + ']'
         html += self.get_remove_html()
         return html
 
@@ -113,7 +113,7 @@ class _NotTagParameter(_TagParameter):
     def get_html(self):
         html = 'Emails without tag '
         html += self.get_tag_name_html()
-        html += '[' + self.get_option_link_html(get_tag_id_search(self.tid), 'with') + '|without]'
+        html += '<br />[' + self.get_option_link_html(get_tag_id_search(self.tid), 'with') + '|without]'
         html += self.get_remove_html()
         return html
 
@@ -145,7 +145,7 @@ class _ContactParameter(_Parameter):
     def get_html(self):
         html = 'Emails to or from '
         html += self.get_contact_name_html()
-        html += '[' + self.get_option_link_html(get_recipient_id_search(self.cid), 'to')
+        html += '<br />[' + self.get_option_link_html(get_recipient_id_search(self.cid), 'to')
         html += '|' + self.get_option_link_html(get_sender_id_search(self.cid), 'from')
         html += '|to or from]'
         html += self.get_remove_html()
@@ -163,7 +163,7 @@ class _SenderParameter(_ContactParameter):
     def get_html(self):
         html = 'Emails from '
         html += self.get_contact_name_html()
-        html += '[' + self.get_option_link_html(get_recipient_id_search(self.cid), 'to')
+        html += '<br />[' + self.get_option_link_html(get_recipient_id_search(self.cid), 'to')
         html += '|from'
         html += '|' + self.get_option_link_html(get_contact_id_search(self.cid), 'to or from')
         html += ']'
@@ -183,7 +183,7 @@ class _RecipientParameter(_ContactParameter):
     def get_html(self):
         html = 'Emails to '
         html += self.get_contact_name_html()
-        html += '[to'
+        html += '<br />[to'
         html += '|' + self.get_option_link_html(get_sender_id_search(self.cid), 'from')
         html += '|' + self.get_option_link_html(get_contact_id_search(self.cid), 'to or from')
         html += ']'
@@ -207,7 +207,7 @@ class _MailParameter(_Parameter):
 
     def get_html(self):
         html = 'Email with unique id ' + self.string_value
-        html += self.get_remove_html()
+        html += ' ' + self.get_remove_html()
         return html
 
 
