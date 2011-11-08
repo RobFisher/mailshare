@@ -36,6 +36,14 @@ class _Parameter(object):
         return html
 
 
+    def _get_option_link_html(self, option_search, option_text):
+        html = '<a href="'
+        new_search = self.search.replace_parameter(self, option_search._parameter)
+        html += new_search.get_url_path()
+        html += '">' + option_text + '</a>'
+        return html
+
+
     def get_hidden_form_html(self):
         html = '<input type="hidden" name="'
         html += self.get_url_parameter_name()
@@ -76,14 +84,36 @@ class _TagParameter(_Parameter):
         return Q(tags__id=self.tid)
 
 
-    def get_html(self):
-        html = 'Emails with tag '
+    def get_tag_name_html(self):
         try:
             tag = models.Tag.objects.get(id=self.tid)
         except models.Tag.DoesNotExist:
-            html += 'unknown'
+            html = 'unknown'
         else:
-            html += tags.tag_to_html(tag)
+            html = tags.tag_to_html(tag)
+        return html
+
+
+    def get_html(self):
+        html = 'Emails with tag '
+        html += self.get_tag_name_html()
+        html += '[with|' + self._get_option_link_html(get_ntag_id_search(self.tid), 'without') + ']'
+        html += self.get_remove_html()
+        return html
+
+
+class _NotTagParameter(_TagParameter):
+    parameter_name = 'ntag_id'
+
+
+    def get_query(self):
+        return (~Q(tags__id=self.tid))
+
+
+    def get_html(self):
+        html = 'Emails without tag '
+        html += self.get_tag_name_html()
+        html += '[' + self._get_option_link_html(get_tag_id_search(self.tid), 'with') + '|without]'
         html += self.get_remove_html()
         return html
 
@@ -105,14 +135,6 @@ class _ContactParameter(_Parameter):
             html += 'unknown'
         else:
             html += email_utils.contact_to_html(sender)
-        return html
-
-
-    def _get_option_link_html(self, option_search, option_text):
-        html = '<a href="'
-        new_search = self.search.replace_parameter(self, option_search._parameter)
-        html += new_search.get_url_path()
-        html += '">' + option_text + '</a>'
         return html
 
 
@@ -192,6 +214,7 @@ class _MailParameter(_Parameter):
 _parameters_map = {
     _FullTextParameter.parameter_name: _FullTextParameter,
     _TagParameter.parameter_name: _TagParameter,
+    _NotTagParameter.parameter_name: _NotTagParameter,
     _ContactParameter.parameter_name: _ContactParameter,
     _SenderParameter.parameter_name: _SenderParameter,
     _RecipientParameter.parameter_name: _RecipientParameter,
@@ -408,6 +431,10 @@ def get_sender_id_search(sender_id):
 
 def get_tag_id_search(tag_id):
     return Search([('tag_id', str(tag_id))])
+
+
+def get_ntag_id_search(tag_id):
+    return Search([('ntag_id', str(tag_id))])
 
 
 def get_contact_id_search(contact_id):
