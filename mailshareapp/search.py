@@ -1,4 +1,6 @@
-"""Module to define the Search class."""
+"""Module to define the Search class and factory functions."""
+
+# License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
 
 from django.db.models import Q
 from django.http import QueryDict
@@ -8,6 +10,9 @@ import tags
 
 
 class _Parameter(object):
+    # Represents a type of search parameter. Each type of search parameter can be
+    # represented in various ways. This class also helps keep track of the index value so that
+    # GET URLs can be constructed with unique parameter names.
     def __init__(self, value, index, search):
         self.string_value = value
         self.index = index
@@ -213,6 +218,8 @@ class _MailParameter(_Parameter):
         return html
 
 
+# When parsing a URL, we want to create Parameter objects of different sub-classes
+# depending on the name in the URL.
 _parameters_map = {
     _FullTextParameter.parameter_name: _FullTextParameter,
     _TagParameter.parameter_name: _TagParameter,
@@ -225,6 +232,8 @@ _parameters_map = {
 
 
 def _get_parameter_name_and_index(field_name):
+    # In a GET request, all the parameter names must be unique. So we append a hyphen and
+    # an index number to the root name. Here we parse out the name and index.
     parameter_name = field_name
     index = 0
     dash_position = field_name.rfind('-')
@@ -235,6 +244,7 @@ def _get_parameter_name_and_index(field_name):
 
 
 def _expand_search_parameters(search_parameters):
+    # convert a list of (name-index, value) tuples into (name, index, value)
     result = []
     for (key, value) in search_parameters:
         (name, index) = _get_parameter_name_and_index(key)
@@ -243,6 +253,9 @@ def _expand_search_parameters(search_parameters):
 
 
 def _expand_and_sort_search_parameters(search_parameters):
+    # The initialiser for the Search class can take a list if (name-index, value) tuples or
+    # (name, index, value) tuples. This makes sure we have the latter, and also sorts the
+    # list by index, which helps things stay in the same order in the UI.
     if len(search_parameters[0]) < 3:
         search_parameters = _expand_search_parameters(search_parameters)
     result = sorted(search_parameters, key=lambda param: param[1])
@@ -250,13 +263,32 @@ def _expand_and_sort_search_parameters(search_parameters):
 
 
 class Search:
-    """Represents a search and can convert between various representations of a search."""
-    def __init__(self, search_parameters, root_search=None, skip_sort=False):
+    """
+    Represents a search and can convert between various representations of a search.
+
+    By representing a search as an object we can represent it as a URL in the user's browser and
+    as a Django query set representing the search results. We can also generate HTML to display
+    information about the search to the user.
+
+    A Search object is typically created from a GET request. We parse the parameters to construct
+    the search. Currently, search parameters can only be ANDed together.
+
+    When using the public interface a Search object behaves as if it were immutable. There are methods
+    for generating new Search objects based on this one, which have search parameters added, removed
+    or modified. In this way we can generate URIs that link to new searches based on the current one.
+    Some of these methods take Search objects as parameters. To create Search objects to pass into these
+    methods, use the get_..._search factory functions.
+
+    """
+    def __init__(self, search_parameters, _root_search=None, _skip_sort=False):
         """
         Create a new search object with the specified parameters.
         
         Arguments:
-        search_parameters -- A list of tuples, where each tuple is a (parameter, value) pair.
+        search_parameters -- A list of tuples, where each tuple is either (parameter-index, value) or
+                             (parameter, index, value). The former is useful as it is what we get from
+                             Django's request.GET.items(). For other uses it is more convenient to use
+                             the get_..._search() factory functions.
 
         """
         self._query_set = None
@@ -264,13 +296,16 @@ class Search:
         self._hidden_form_html = None
         self._url_path = None
         self._parameter = None
+
+        # Each Search object manages only one _Parameter object. To AND together several parameters,
+        # we recursively link to more Search objects.
         self._and = None
         self.root_search = self
 
-        if root_search != None:
-            self.root_search = root_search
+        if _root_search != None:
+            self.root_search = _root_search
 
-        if not skip_sort:
+        if not _skip_sort:
             search_parameters = _expand_and_sort_search_parameters(search_parameters)
 
         # handle the first parameter
@@ -284,7 +319,8 @@ class Search:
             self._and = Search(search_parameters[1:], self.root_search, True)
 
 
-    def filter_results(self, results):
+    def _filter_results(self, results):
+        # Apply the filter for our _Parameter object and recursively apply the filter for ANDed parameters.
         q = None
         if self._parameter:
             q = self._parameter.get_query()
@@ -294,19 +330,20 @@ class Search:
                 results = models.Mail.objects.none()
 
         if self._and:
-            results = self._and.filter_results(results)
+            results = self._and._filter_results(results)
         return results
 
 
     def get_query_set(self):
-        """Return a Django query set associated with this search."""
+        """Return a Django query set representing the results of this search."""
         if self._query_set == None:
-            self._query_set = self.filter_results(models.Mail.objects.all())
+            self._query_set = self._filter_results(models.Mail.objects.all())
 
         return self._query_set
 
 
     def get_html(self):
+        """Return HTML representing the parameters of this search."""
         if self._html == None:
             self._html = '<p>'
             if self._parameter:
@@ -319,6 +356,7 @@ class Search:
 
 
     def get_hidden_form_html(self):
+        """Return HTML representing hidden form items that represent the current search and will recreate it with a GET request."""
         if self._hidden_form_html == None:
             self._hidden_form_html = ''
             if self._parameter:
@@ -330,28 +368,33 @@ class Search:
 
 
     def get_form_query_name(self):
+        """Return the name of the text box to use in a search form that will generate a search with a new full text query appended to this one."""
         next_index = self.get_highest_index() + 1
         return 'query-' + str(next_index)
 
 
-    def append_url_parameters(self, url_path):
+    def _append_url_parameters(self, url_path):
+        # recurse through ANDed searches to construct the URL path
         if self._parameter:
             url_path += self._parameter.get_url_param()
         if self._and:
             url_path += '&'
-            url_path = self._and.append_url_parameters(url_path)
+            url_path = self._and._append_url_parameters(url_path)
         return url_path
 
 
     def get_url_path(self):
+        """Return a URL path that links to this search."""
         if self._url_path == None:
             self._url_path = '/search/?'
-            self._url_path = self.append_url_parameters(self._url_path)
+            self._url_path = self._append_url_parameters(self._url_path)
 
         return self._url_path
 
 
     def _copy(self, root_search=None):
+        # Create a copy of this search. Using this we avoid modifying existing Search objects, so that
+        # they appear immutable.
         new_search = Search( \
             [(self._parameter.parameter_name, self._parameter.index, self._parameter.string_value)], root_search)
         if self._and:
@@ -360,12 +403,15 @@ class Search:
 
 
     def add_and(self, search):
+        """Return a new Search equal to this Search AND the specified Search."""
         new_search = self._copy()
         new_search._add_and(search)
         return new_search
 
 
     def _add_and(self, search):
+        # AND the specified Search object with this search. We recurse through the _and chain and add
+        # the new search to the end.
         if self._and:
             self._and._add_and(search)
         else:
@@ -376,12 +422,14 @@ class Search:
 
 
     def remove_parameter(self, name, value):
+        """Return a new Search equal to this Search with the matching parameter removed."""
         new_search = self._copy()
         new_search = new_search._remove_parameter(name, value)
         return new_search
 
 
     def _remove_parameter(self, name, value):
+        # Search through the _and chain for the specified parameter and remove it.
         if name == self._parameter.parameter_name and \
                 value == self._parameter.string_value:
             return self._and
@@ -396,6 +444,12 @@ class Search:
 
 
     def replace_parameter(self, old_parameter, new_parameter):
+        """
+        Return a new Search with equal to this search but with old_parameter replaced with new_parameter.
+
+        The parameter replaced is the one whose index is the same as old_paramete's.
+
+        """
         new_search = self._copy()
         new_search._replace_parameter( \
             old_parameter, new_parameter.parameter_name, new_parameter.string_value, \
@@ -404,6 +458,7 @@ class Search:
 
 
     def _replace_parameter(self, old_parameter, name, value, index):
+        # Search through the _and chain for the old parameter and replace it.
         if old_parameter.index == self._parameter.index:
             new_parameter = _parameters_map[name](value, index, self.root_search)
             self._parameter = new_parameter
@@ -412,10 +467,12 @@ class Search:
 
 
     def get_highest_index(self):
+        """Return the current highest index. Useful when adding new parameters which need a unique index."""
         return self.root_search._get_highest_index()
 
 
     def _get_highest_index(self, highest_so_far=0):
+        # Recurse through the _and chain to find the highest index.
         if self._parameter.index > highest_so_far:
             highest_so_far = self._parameter.index
         if self._and:
@@ -424,34 +481,42 @@ class Search:
 
 
 def get_full_text_search(query):
+    """Return a new Search object representing a full text search for the specified string."""
     return Search([('query', query)])
 
 
 def get_mail_id_search(mail_id):
+    """Return a new Search object representing a search for a mail with the specified id."""
     return Search([('mail_id', str(mail_id))])
 
 
 def get_sender_id_search(sender_id):
+    """Return a new Search object representing a search for mails with the specified sender."""
     return Search([('sender', str(sender_id))])
 
 
 def get_tag_id_search(tag_id):
+    """Return a new Search object representing a search for mails with the specified tag."""
     return Search([('tag_id', str(tag_id))])
 
 
 def get_ntag_id_search(tag_id):
+    """Return a new Search object representing a search for mails that do not have the specified tag."""
     return Search([('ntag_id', str(tag_id))])
 
 
 def get_contact_id_search(contact_id):
+    """Return a new Search object representing a search for mails sent or received by the specified contact."""
     return Search([('contact', str(contact_id))])
 
 
 def get_recipient_id_search(contact_id):
+    """Return a new Search object representing a search for mails received by the specified contact."""
     return Search([('recipient', str(contact_id))])
 
 
 def get_search_from_url(url):
+    """Return a new Search object described by the specified GET request URL."""
     url_parameters = url[url.rfind('?')+1:]
     qd = QueryDict(url_parameters)
     return Search(qd.items())
