@@ -209,9 +209,24 @@ def _get_parameter_name_and_index(field_name):
     return (parameter_name, index)
 
 
+def _expand_search_parameters(search_parameters):
+    result = []
+    for (key, value) in search_parameters:
+        (name, index) = _get_parameter_name_and_index(key)
+        result.append((name, index, value))
+    return result
+
+
+def _expand_and_sort_search_parameters(search_parameters):
+    if len(search_parameters[0]) < 3:
+        search_parameters = _expand_search_parameters(search_parameters)
+    result = sorted(search_parameters, key=lambda param: param[1])
+    return result
+
+
 class Search:
     """Represents a search and can convert between various representations of a search."""
-    def __init__(self, search_parameters, root_search=None):
+    def __init__(self, search_parameters, root_search=None, skip_sort=False):
         """
         Create a new search object with the specified parameters.
         
@@ -230,16 +245,18 @@ class Search:
         if root_search != None:
             self.root_search = root_search
 
+        if not skip_sort:
+            search_parameters = _expand_and_sort_search_parameters(search_parameters)
+
         # handle the first parameter
         if len(search_parameters) > 0:
-            (parameter_name, parameter_index) = _get_parameter_name_and_index(search_parameters[0][0])
-            parameter_value = search_parameters[0][1]
-            if parameter_name in _parameters_map:
-                self._parameter = _parameters_map[parameter_name](parameter_value, parameter_index, self.root_search)
+            (name, index, value) = search_parameters[0]
+            if name in _parameters_map:
+                self._parameter = _parameters_map[name](value, index, self.root_search)
         
         # handle any remaining parameters
         if len(search_parameters) > 1:
-            self._and = Search(search_parameters[1:], self.root_search)
+            self._and = Search(search_parameters[1:], self.root_search, True)
 
 
     def filter_results(self, results):
@@ -311,7 +328,7 @@ class Search:
 
     def _copy(self, root_search=None):
         new_search = Search( \
-            [(self._parameter.parameter_name + '-' + str(self._parameter.index), self._parameter.string_value)], root_search)
+            [(self._parameter.parameter_name, self._parameter.index, self._parameter.string_value)], root_search)
         if self._and:
             new_search._and = self._and._copy(new_search.root_search)
         return new_search
