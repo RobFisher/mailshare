@@ -2,6 +2,7 @@
 
 # License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
 
+import datetime
 from django.db.models import Q
 from django.http import QueryDict
 import models
@@ -218,6 +219,43 @@ class _MailParameter(_Parameter):
         return html
 
 
+class _AgeInDaysParameter(_Parameter):
+    parameter_name = 'days'
+
+
+    def __init__(self, value, index, search):
+        super(_AgeInDaysParameter, self).__init__(value, index, search)
+        self.days = int(value)
+
+
+    def get_query(self):
+        start_date = datetime.date.today()-datetime.timedelta(self.days)
+        return Q(date__gte=start_date)
+
+
+    def get_html(self):
+        html = 'Emails from the last ' + self.string_value + ' day'
+        if self.days != 1:
+            html += 's [' + self.get_option_link_html(get_days_search(1), 'day')
+        else:
+            html += ' [day'
+        if self.days != 7:
+            html += '|' + self.get_option_link_html(get_days_search(7), 'week')
+        else:
+            html += '|week'
+        if self.days != 30:
+            html += '|' + self.get_option_link_html(get_days_search(30), 'month')
+        else:
+            html += '|month'
+        if self.days != 365:
+            html += '|' + self.get_option_link_html(get_days_search(365), 'year')
+        else:
+            html += '|year'
+        html += ']'
+        html += self.get_remove_html()
+        return html
+
+
 # When parsing a URL, we want to create Parameter objects of different sub-classes
 # depending on the name in the URL.
 _parameters_map = {
@@ -228,6 +266,7 @@ _parameters_map = {
     _SenderParameter.parameter_name: _SenderParameter,
     _RecipientParameter.parameter_name: _RecipientParameter,
     _MailParameter.parameter_name: _MailParameter,
+    _AgeInDaysParameter.parameter_name: _AgeInDaysParameter,
 }
 
 
@@ -513,6 +552,11 @@ def get_contact_id_search(contact_id):
 def get_recipient_id_search(contact_id):
     """Return a new Search object representing a search for mails received by the specified contact."""
     return Search([(_RecipientParameter.parameter_name, str(contact_id))])
+
+
+def get_days_search(days):
+    """Return new Search object representing a search for emails received in the last days days."""
+    return Search([(_AgeInDaysParameter.parameter_name, str(days))])
 
 
 def get_search_from_url(url):
