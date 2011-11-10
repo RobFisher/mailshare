@@ -9,8 +9,8 @@ from dajaxice.core import dajaxice_autodiscover
 dajaxice_autodiscover()
 
 urlpatterns = patterns('mailshareapp.views',
-    (r'^$', 'index'),
-    (r'^search/$', 'search'),
+    (r'^$', 'index_view'),
+    (r'^search/$', 'search_view'),
     #(r'^browse/$', 'browse'),
     #(r'^view/(?P<email_id>\d+)/$', 'email'),
 )

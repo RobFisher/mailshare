@@ -11,7 +11,10 @@
 <body>
 <h1>Mailshare</h1>
 <form action="search/" name="search" method="GET">
-<input id="query" name="query" value="" />
+{% if hidden_form %}
+    {% autoescape off %}{{ hidden_form }}{% endautoescape %}
+{% endif %}
+<input id="query" name="query-1" value="" />
 <input id="submit" type="submit" value="Search" />
 </form>
 <p>Tag cloud from emails in the last week:</p>

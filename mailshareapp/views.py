@@ -5,15 +5,21 @@ from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db.models import Q
 from mailshareapp.models import Mail, Contact, Tag
-from mailshareapp.search import Search
+import search
 import email_utils
 import tags
 
-def index(request):
-    last_week_emails = Mail.objects.filter(date__gte=datetime.date.today()-datetime.timedelta(7))
-    tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails)
+
+def index_view(request):
+    week_search = search.get_days_search(70)
+    last_week_emails = week_search.get_query_set()
+    month_search = search.get_days_search(30)
+    tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails, month_search)
     t = loader.get_template('index.html')
-    c = RequestContext(request, {'tag_cloud':tag_cloud,})
+    c = RequestContext(request, {
+            'tag_cloud': tag_cloud,
+            'hidden_form': month_search.get_hidden_form_html(),
+    })
     return HttpResponse(t.render(c))
 
 
@@ -36,33 +42,33 @@ def get_int(request, parameter):
     return result
 
 
-def get_expanded_html(mail, search=None):
+def get_expanded_html(mail, current_search=None):
     """Return the HTML representing the expanded email."""
-    expanded_html = email_utils.mail_contacts_bar_html(mail, search)
-    expanded_html += tags.mail_tags_bar_html(mail, search)
+    expanded_html = email_utils.mail_contacts_bar_html(mail, current_search)
+    expanded_html += tags.mail_tags_bar_html(mail, current_search)
     expanded_html += email_utils.mail_body_html(mail)
     return expanded_html
 
 
-def search(request):
+def search_view(request):
     search_query = get_string(request, 'query')
     tag_cloud = ''
     expanded_html = ''
     
-    search = Search(request.GET.items())
+    s = search.Search(request.GET.items())
 
-    if len(search.get_query_set()) == 1:
-        expanded_html = get_expanded_html(search.get_query_set()[0], search)
-    elif len(search.get_query_set()) != 0:
-        tag_cloud = tags.search_results_to_tag_cloud_html(search.get_query_set(), search)
+    if len(s.get_query_set()) == 1:
+        expanded_html = get_expanded_html(s.get_query_set()[0], s)
+    elif len(s.get_query_set()) != 0:
+        tag_cloud = tags.search_results_to_tag_cloud_html(s.get_query_set(), s)
 
     t = loader.get_template('search.html')
     c = RequestContext(request, {
-        'query_name': search.get_form_query_name(),
-        'hidden_form': search.get_hidden_form_html(),
-        'search_html': search.get_html(),
+        'query_name': s.get_form_query_name(),
+        'hidden_form': s.get_hidden_form_html(),
+        'search_html': s.get_html(),
         'tag_cloud': tag_cloud,
         'expanded_html': expanded_html,
-        'results' : search.get_query_set(),
+        'results' : s.get_query_set(),
     })
     return HttpResponse(t.render(c))
