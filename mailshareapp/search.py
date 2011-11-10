@@ -229,8 +229,26 @@ class _AgeInDaysParameter(_Parameter):
 
 
     def get_query(self):
+        # We want to do this:
+        # start_date = datetime.date.today()-datetime.timedelta(self.days)
+        # return Q(date__gte=start_date)
+        #
+        # But there is a bug in MySQL which causes this error:
+        # Truncated incorrect DOUBLE value.
+        #
+        # Instead we use this workaround in filter_query_set below:
+        # https://code.djangoproject.com/ticket/7074#comment:13
+        #
+        # The MySQL bug is fixed in 5.5.0 but in Ubuntu 10.04 LTS we have 5.1.41.
+        # http://bugs.mysql.com/bug.php?id=34374
+        return None
+
+
+    def filter_query_set(self, query_set):
+        # See comments in get_query, above, for why this method exists
         start_date = datetime.date.today()-datetime.timedelta(self.days)
-        return Q(date__gte=start_date)
+        result = query_set.extra(where=['date >= DATE(%s)'], params=[start_date])
+        return result
 
 
     def get_html(self):
@@ -366,7 +384,7 @@ class Search:
             if q:
                 results = results.filter(q).distinct()
             else:
-                results = models.Mail.objects.none()
+                results = self._parameter.filter_query_set(results)
 
         if self._and:
             results = self._and._filter_results(results)
