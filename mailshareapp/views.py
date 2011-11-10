@@ -11,7 +11,7 @@ import tags
 
 
 def index_view(request):
-    week_search = search.get_days_search(70)
+    week_search = search.get_days_search(7)
     last_week_emails = week_search.get_query_set()
     month_search = search.get_days_search(30)
     tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails, month_search)
