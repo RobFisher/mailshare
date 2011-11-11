@@ -34,7 +34,7 @@ def add_tag(request, email_id, tag, url):
 
 
 @dajaxice_register
-def delete_tag(request, email_id, tag_id):
+def delete_tag(request, email_id, tag_id, url):
     dajax = Dajax()
     try:
         mail = Mail.objects.get(id=email_id)
@@ -43,7 +43,8 @@ def delete_tag(request, email_id, tag_id):
         pass
     else:
         mail.tags.remove(tag)
-        tags_html = tags.mail_tags_to_html_list(mail)
+        search_object = search.get_search_from_url(url)
+        tags_html = tags.mail_tags_to_html_list(mail, search_object)
         tags_html += tags.undo_delete_html(mail, tag)
         dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
     return dajax.json()
