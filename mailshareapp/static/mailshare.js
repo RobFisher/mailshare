@@ -129,13 +129,27 @@ function unselect_email(mail_id) {
     selected_emails.splice(selected_emails.indexOf(mail_id), 1);
 }
 
-function select_mail(checkbox, mail_id) {
+function get_multibar_update() {
+    Dajaxice.mailshare.mailshareapp.get_multibar_tags(Dajax.process,{'selected_mails':selected_emails, 'url':location.href});
+}
+
+function update_multibar(data) {
+    if(data.tags_html != '') {
+        $("#multi_bar_tags").html(data.tags_html);
+    }
+    else {
+        $("#multi_bar_tags").html("Select emails to view their tags.");
+    }
+}
+
+function checkbox_clicked(checkbox, mail_id) {
     if(checkbox.checked) {
 	select_email(mail_id);
     }
     else {
 	unselect_email(mail_id);
     }
+    get_multibar_update();
 }
 
 function invert_selection() {
@@ -150,4 +164,5 @@ function invert_selection() {
 	    this.checked = true;
 	}
     });
+    get_multibar_update();
 }

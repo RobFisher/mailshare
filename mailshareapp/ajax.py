@@ -82,3 +82,12 @@ def delete_email(request, email_id):
 
     dajax.add_data({'success':success}, 'mail_deleted')
     return dajax.json()
+
+
+@dajaxice_register
+def get_multibar_tags(request, selected_mails, url):
+    dajax = Dajax()
+    search_object = search.get_search_from_url(url)
+    result = tags.mail_tags_multibar_html(search_object, selected_mails)
+    dajax.add_data({'tags_html':result}, 'update_multibar')
+    return dajax.json()

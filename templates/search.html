@@ -37,8 +37,10 @@
 
 {% if results %}
     <div class="multi_bar">
-    <form><input type="button" onclick="invert_selection()" value="Invert" /></form>
-    <span id="multi_bar_tags"></span>
+        <form>
+            <input type="button" onclick="invert_selection()" value="Invert" />
+            <span id="multi_bar_tags">Select emails to view their tags.</span>
+        </form>
     </div>
 
     <table>
@@ -50,7 +52,7 @@
         {% endif %}
             <td>
                 <form><input class="mailcheck" type="checkbox" name="check_{{ result.id }}"
-                           onclick="var event = arguments[0] || window.event; event.stopPropagation(); select_mail(this, {{ result.id }});" /></form>
+                           onclick="var event = arguments[0] || window.event; event.stopPropagation(); checkbox_clicked(this, {{ result.id }});" /></form>
             </td>
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>

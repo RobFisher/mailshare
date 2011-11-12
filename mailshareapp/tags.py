@@ -126,6 +126,27 @@ def mail_tags_bar_html(m, search_object):
     return result
 
 
+def mail_tags_multibar_html(search_object, mail_ids):
+    result = ''
+    tag_set = set([])
+    for mail_id in mail_ids:
+        try:
+            m = models.Mail.objects.get(id=mail_id)
+        except:
+            pass
+        else:
+            tags = m.tags.all()
+            for tag in tags:
+                tag_set.add(tag)
+    tags = sorted(tag_set, key=lambda t: t.name)
+    if len(tags) > 0:
+        result += tag_to_html(tags[0], search_object)
+    for t in tags[1:]:
+        result += ', '
+        result += tag_to_html(t, search_object)
+    return result
+
+
 def build_tags_histogram(queryset):
     """Given a queryset containing Mail objects, return a sorted list of (tag, frequency) tuples."""
     tags_dict = {}
