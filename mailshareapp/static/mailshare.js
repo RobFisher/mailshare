@@ -119,3 +119,35 @@ function mail_deleted(success) {
 	alert("Unable to delete email.");
     }
 }
+
+var selected_emails = [];
+function select_email(mail_id) {
+    selected_emails.push(mail_id);
+}
+
+function unselect_email(mail_id) {
+    selected_emails.splice(selected_emails.indexOf(mail_id), 1);
+}
+
+function select_mail(checkbox, mail_id) {
+    if(checkbox.checked) {
+	select_email(mail_id);
+    }
+    else {
+	unselect_email(mail_id);
+    }
+}
+
+function invert_selection() {
+    $(".mailcheck").each(function(i) {
+	var mail_id = parseInt(this.name.substr(6));
+	if(this.checked) {
+	    unselect_email(mail_id);
+	    this.checked = false;
+	}
+	else {
+	    select_email(mail_id);
+	    this.checked = true;
+	}
+    });
+}

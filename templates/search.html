@@ -36,6 +36,11 @@
 {% endif %}
 
 {% if results %}
+    <div class="multi_bar">
+    <form><input type="button" onclick="invert_selection()" value="Invert" /></form>
+    <span id="multi_bar_tags"></span>
+    </div>
+
     <table>
     {% for result in results %}
         {% if expanded_html %}
@@ -43,17 +48,21 @@
         {% else %}
         <tr onclick="toggle_email_body({{ result.id }})" class="mailhead {% cycle 'odd' 'even' %}">
         {% endif %}
+            <td>
+                <form><input class="mailcheck" type="checkbox" name="check_{{ result.id }}"
+                           onclick="var event = arguments[0] || window.event; event.stopPropagation(); select_mail(this, {{ result.id }});" /></form>
+            </td>
             <td>{{ result.date }}</td>
             <td>{{ result.sender }}</td>
             <td>{{ result.subject }}</td>
         </tr>
 	<tr>
             {% if expanded_html %}
-            <td colspan="3" class="mailbody shown" id="body_{{ result.id }}">
+            <td colspan="4" class="mailbody shown" id="body_{{ result.id }}">
                 {% autoescape off %}{{ expanded_html }}{% endautoescape %}
             </td>
             {% else %}
-	    <td colspan="3" class="mailbody empty" id="body_{{ result.id }}"></td>
+	    <td colspan="4" class="mailbody empty" id="body_{{ result.id }}"></td>
             {% endif %}
 	</tr>
     {% endfor %}
