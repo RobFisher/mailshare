@@ -86,16 +86,16 @@ def tag_to_html(t, s=None):
     return result
 
 
-def tag_to_delete_html(m, t):
+def tag_to_delete_html(mail_id, t):
     """Render a delete link for the specified mail and tag as HTML."""
-    result = '[<a href="#" onclick="delete_tag(' + str(m.id) + ',' + str(t.id) + '); return false;">x</a>]'
+    result = '[<a href="#" onclick="delete_tag(' + str(mail_id) + ',' + str(t.id) + '); return false;">x</a>]'
     return result
 
 
-def undo_delete_html(m, t):
+def undo_delete_html(mail_id, t):
     """Render an undo link for a deleted tag as HTML."""
     result = ' Tag ' + t.name + ' deleted ['
-    result += '<a href="#" onclick="add_tag_to_email(' + str(m.id) + ',\'' + t.name + '\'); return false;">'
+    result += '<a href="#" onclick="add_tag_to_email(' + str(mail_id) + ',\'' + t.name + '\'); return false;">'
     result += 'undo</a>]'
     return result
 
@@ -105,11 +105,20 @@ def mail_tags_to_html_list(m, search_object):
     tags = m.tags.all()
     if len(tags) > 0:
         result += tag_to_html(tags[0], search_object)
-        result += tag_to_delete_html(m, tags[0])
+        result += tag_to_delete_html(m.id, tags[0])
     for t in tags[1:]:
         result += ', '
         result += tag_to_html(t, search_object)
-        result += tag_to_delete_html(m, t)
+        result += tag_to_delete_html(m.id, t)
+    return result
+
+
+def add_tag_button_html(mail_id):
+    result = '<input class="hidden" id="tagbox_' + str(mail_id)
+    result += '" onkeypress="tag_key(event, ' + str(mail_id)
+    result += ')" onblur="tagbox_blur(' + str(mail_id) + ')" />'
+    result += '<input type="button" class="shown" value="+" id="tagbutton_'
+    result += str(mail_id) + '" onClick="add_tag(' + str(mail_id) + ')" />'
     return result
 
 
@@ -117,17 +126,15 @@ def mail_tags_bar_html(m, search_object):
     """Generate tags bar for mail in HTML."""
     result = '<div class="tags"><p>Tags: <span id="taglist_' + str(m.id)  + '">'
     result += mail_tags_to_html_list(m, search_object) + '</span>'
-    result += '<input class="hidden" id="tagbox_' + str(m.id)
-    result += '" onkeypress="tag_key(event, ' + str(m.id)
-    result += ')" onblur="tagbox_blur(' + str(m.id) + ')" />'
-    result += '<input type="button" class="shown" value="+" id="tagbutton_'
-    result += str(m.id) + '" onClick="add_tag(' + str(m.id) + ')" />'
+    result += add_tag_button_html(m.id)
     result += '</p></div>'
     return result
 
 
 def mail_tags_multibar_html(search_object, mail_ids):
     result = ''
+    if len(mail_ids) == 0:
+        return ''
     tag_set = set([])
     for mail_id in mail_ids:
         try:
@@ -141,9 +148,12 @@ def mail_tags_multibar_html(search_object, mail_ids):
     tags = sorted(tag_set, key=lambda t: t.name)
     if len(tags) > 0:
         result += tag_to_html(tags[0], search_object)
+        result += tag_to_delete_html(-1, tags[0])
     for t in tags[1:]:
         result += ', '
         result += tag_to_html(t, search_object)
+        result += tag_to_delete_html(-1, t)
+    result += add_tag_button_html(-1)
     return result
 
 

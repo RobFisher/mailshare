@@ -72,11 +72,24 @@ function add_tag(email_id) {
 }
 
 function add_tag_to_email(email_id, text) {
-    Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':text, 'url':location.href});
+    if(email_id == -1) {
+	Dajaxice.mailshare.mailshareapp.multi_add_tag(Dajax.process,{'selected_mails':selected_mails,'tag':text, 'url':location.href});
+    }
+    else {
+	Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':text, 'url':location.href});
+    }
 }
 
 function delete_tag(email_id, tag_id) {
-    Dajaxice.mailshare.mailshareapp.delete_tag(Dajax.process,{'email_id':email_id,'tag_id':tag_id, 'url':location.href});
+    if(email_id == -1) {
+	var answer = confirm("Deleting a tag from selected emails cannot be undone.");
+        if(answer) {
+	    Dajaxice.mailshare.mailshareapp.multi_delete_tag(Dajax.process,{'selected_mails':selected_mails,'tag_id':tag_id, 'url':location.href});
+        }
+    }
+    else {
+        Dajaxice.mailshare.mailshareapp.delete_tag(Dajax.process,{'email_id':email_id,'tag_id':tag_id, 'url':location.href});
+    }
     return false;
 }
 
@@ -120,17 +133,17 @@ function mail_deleted(success) {
     }
 }
 
-var selected_emails = [];
+var selected_mails = [];
 function select_email(mail_id) {
-    selected_emails.push(mail_id);
+    selected_mails.push(mail_id);
 }
 
 function unselect_email(mail_id) {
-    selected_emails.splice(selected_emails.indexOf(mail_id), 1);
+    selected_mails.splice(selected_mails.indexOf(mail_id), 1);
 }
 
 function get_multibar_update() {
-    Dajaxice.mailshare.mailshareapp.get_multibar_tags(Dajax.process,{'selected_mails':selected_emails, 'url':location.href});
+    Dajaxice.mailshare.mailshareapp.get_multibar_tags(Dajax.process,{'selected_mails':selected_mails, 'url':location.href});
 }
 
 function update_multibar(data) {
@@ -138,7 +151,7 @@ function update_multibar(data) {
         $("#multi_bar_tags").html(data.tags_html);
     }
     else {
-        $("#multi_bar_tags").html("Select emails to view their tags.");
+        $("#multi_bar_tags").html("Select emails to view and edit their tags.");
     }
 }
 

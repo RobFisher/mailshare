@@ -45,9 +45,40 @@ def delete_tag(request, email_id, tag_id, url):
         mail.tags.remove(tag)
         search_object = search.get_search_from_url(url)
         tags_html = tags.mail_tags_to_html_list(mail, search_object)
-        tags_html += tags.undo_delete_html(mail, tag)
+        tags_html += tags.undo_delete_html(mail.id, tag)
         dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
     return dajax.json()
+
+
+@dajaxice_register
+def multi_add_tag(request, selected_mails, tag, url):
+    search_object = search.get_search_from_url(url)
+    t = tags.get_or_create_tag(tag)
+    for mail_id in selected_mails:
+        try:
+            m = Mail.objects.get(id=mail_id)
+        except:
+            pass
+        else:
+            m.tags.add(t)
+    return get_multibar_tags(request, selected_mails, url)
+
+
+@dajaxice_register
+def multi_delete_tag(request, selected_mails, tag_id, url):
+    try:
+        tag = Tag.objects.get(id=tag_id)
+    except(Tag.DoesNotExist, Tag.MultipleObjectsReturned):
+        tag = None
+    else:
+        for mail_id in selected_mails:
+            try:
+                mail = Mail.objects.get(id=mail_id)
+            except(Mail.DoesNotExist, Mail.MultipleObjectsReturned):
+                pass
+            else:
+                mail.tags.remove(tag)
+    return get_multibar_tags(request, selected_mails, url)
 
 
 @dajaxice_register
