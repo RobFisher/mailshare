@@ -179,3 +179,18 @@ function invert_selection() {
     });
     get_multibar_update();
 }
+
+
+function document_ready_function() {
+    $(".mailcheck").each(function(i) {
+	var mail_id = parseInt(this.name.substr(6));
+        if(this.checked) {
+            select_email(mail_id);
+	}
+    });
+    if(selected_mails.length > 0) {
+        get_multibar_update();
+    }
+}
+
+$(document).ready(document_ready_function);
