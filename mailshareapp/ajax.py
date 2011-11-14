@@ -34,13 +34,9 @@ def get_email_tags(request, email_id, url):
     return dajax.json()
 
 
-@dajaxice_register
-def get_tag_cloud(request, url):
-    dajax = Dajax()
-    search_object = search.get_search_from_url(url)
+def update_tag_cloud(dajax, search_object):
     tag_cloud_html = tags.search_results_to_tag_cloud_html(search_object.get_query_set(), search_object)
     dajax.add_data({'tag_cloud_html':tag_cloud_html}, 'update_tag_cloud')
-    return dajax.json()
 
 
 @dajaxice_register
@@ -53,6 +49,7 @@ def add_tag(request, email_id, tag, url):
         mails[0].tags.add(t)
     tags_html = tags.mail_tags_to_html_list(mails[0], search_object)
     dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
+    update_tag_cloud(dajax, search_object)
     return dajax.json()
 
 
@@ -70,6 +67,7 @@ def delete_tag(request, email_id, tag_id, url):
         tags_html = tags.mail_tags_to_html_list(mail, search_object)
         tags_html += tags.undo_delete_html(mail.id, tag)
         dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
+        update_tag_cloud(dajax, search_object)
     return dajax.json()
 
 
@@ -87,6 +85,7 @@ def multi_add_tag(request, selected_mails, tag, url):
             m.tags.add(t)
     result = tags.mail_tags_multibar_html(search_object, selected_mails, True)
     dajax.add_data({'tags_html':result, 'tags_only':True, 'tags_changed':True}, 'update_multibar')
+    update_tag_cloud(dajax, search_object)
     return dajax.json()
 
 
@@ -108,6 +107,7 @@ def multi_delete_tag(request, selected_mails, tag_id, url):
                 mail.tags.remove(tag)
     result = tags.mail_tags_multibar_html(search_object, selected_mails, True)
     dajax.add_data({'tags_html':result, 'tags_only':True, 'tags_changed':True}, 'update_multibar')
+    update_tag_cloud(dajax, search_object)
     return dajax.json()
 
 

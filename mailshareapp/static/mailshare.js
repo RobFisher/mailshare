@@ -173,6 +173,10 @@ function update_open_mail_tags() {
     });
 }
 
+function update_tag_cloud(data) {
+    $(".tag_cloud").html(data.tag_cloud_html);
+}
+
 function checkbox_clicked(checkbox, mail_id) {
     if(checkbox.checked) {
 	select_email(mail_id);
