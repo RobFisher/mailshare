@@ -161,6 +161,16 @@ function update_multibar(data) {
         $(identifier).html("Select emails to view and edit their tags.");
     }
     $("#tagbox_-1").val('');
+    if(data.tags_changed) {
+	update_open_mail_tags();
+    }
+}
+
+function update_open_mail_tags() {
+    $('span[id^="taglist_"]').each(function(i) {
+        var email_id = parseInt(this.id.substr(8));
+	Dajaxice.mailshare.mailshareapp.get_email_tags(Dajax.process,{'email_id':email_id, 'url':location.href});
+    });
 }
 
 function checkbox_clicked(checkbox, mail_id) {

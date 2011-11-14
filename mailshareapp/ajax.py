@@ -21,6 +21,29 @@ def expand_email(request, email_id, url):
 
 
 @dajaxice_register
+def get_email_tags(request, email_id, url):
+    dajax = Dajax()
+    search_object = search.get_search_from_url(url)
+    try:
+        mail = Mail.objects.get(id=email_id)
+    except(Mail.DoesNotExist, Mail.MultipleObjectsReturned):
+        pass
+    else:
+        tags_html = tags.mail_tags_to_html_list(mail, search_object)
+        dajax.add_data({'email_id':email_id, 'tags_html':tags_html}, 'update_tags')
+    return dajax.json()
+
+
+@dajaxice_register
+def get_tag_cloud(request, url):
+    dajax = Dajax()
+    search_object = search.get_search_from_url(url)
+    tag_cloud_html = tags.search_results_to_tag_cloud_html(search_object.get_query_set(), search_object)
+    dajax.add_data({'tag_cloud_html':tag_cloud_html}, 'update_tag_cloud')
+    return dajax.json()
+
+
+@dajaxice_register
 def add_tag(request, email_id, tag, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
@@ -63,12 +86,14 @@ def multi_add_tag(request, selected_mails, tag, url):
         else:
             m.tags.add(t)
     result = tags.mail_tags_multibar_html(search_object, selected_mails, True)
-    dajax.add_data({'tags_html':result, 'tags_only':True}, 'update_multibar')
+    dajax.add_data({'tags_html':result, 'tags_only':True, 'tags_changed':True}, 'update_multibar')
     return dajax.json()
 
 
 @dajaxice_register
 def multi_delete_tag(request, selected_mails, tag_id, url):
+    dajax = Dajax()
+    search_object = search.get_search_from_url(url)
     try:
         tag = Tag.objects.get(id=tag_id)
     except(Tag.DoesNotExist, Tag.MultipleObjectsReturned):
@@ -81,7 +106,9 @@ def multi_delete_tag(request, selected_mails, tag_id, url):
                 pass
             else:
                 mail.tags.remove(tag)
-    return get_multibar_tags(request, selected_mails, url)
+    result = tags.mail_tags_multibar_html(search_object, selected_mails, True)
+    dajax.add_data({'tags_html':result, 'tags_only':True, 'tags_changed':True}, 'update_multibar')
+    return dajax.json()
 
 
 @dajaxice_register
@@ -123,5 +150,5 @@ def get_multibar_tags(request, selected_mails, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     result = tags.mail_tags_multibar_html(search_object, selected_mails)
-    dajax.add_data({'tags_html':result, 'tags_only':False}, 'update_multibar')
+    dajax.add_data({'tags_html':result, 'tags_only':False, 'tags_changed':False}, 'update_multibar')
     return dajax.json()
