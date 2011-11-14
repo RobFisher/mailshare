@@ -52,6 +52,7 @@ def delete_tag(request, email_id, tag_id, url):
 
 @dajaxice_register
 def multi_add_tag(request, selected_mails, tag, url):
+    dajax = Dajax()
     search_object = search.get_search_from_url(url)
     t = tags.get_or_create_tag(tag)
     for mail_id in selected_mails:
@@ -61,7 +62,9 @@ def multi_add_tag(request, selected_mails, tag, url):
             pass
         else:
             m.tags.add(t)
-    return get_multibar_tags(request, selected_mails, url)
+    result = tags.mail_tags_multibar_html(search_object, selected_mails, True)
+    dajax.add_data({'tags_html':result, 'tags_only':True}, 'update_multibar')
+    return dajax.json()
 
 
 @dajaxice_register
@@ -120,5 +123,5 @@ def get_multibar_tags(request, selected_mails, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     result = tags.mail_tags_multibar_html(search_object, selected_mails)
-    dajax.add_data({'tags_html':result}, 'update_multibar')
+    dajax.add_data({'tags_html':result, 'tags_only':False}, 'update_multibar')
     return dajax.json()

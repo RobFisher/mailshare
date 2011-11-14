@@ -147,12 +147,20 @@ function get_multibar_update() {
 }
 
 function update_multibar(data) {
-    if(data.tags_html != '') {
-        $("#multi_bar_tags").html(data.tags_html);
+    var identifier;
+    if(data.tags_only) {
+        identifier = "#multi_bar_tag_list";
     }
     else {
-        $("#multi_bar_tags").html("Select emails to view and edit their tags.");
+        identifier = "#multi_bar_tags";
     }
+    if(data.tags_html != '') {
+        $(identifier).html(data.tags_html);
+    }
+    else {
+        $(identifier).html("Select emails to view and edit their tags.");
+    }
+    $("#tagbox_-1").val('');
 }
 
 function checkbox_clicked(checkbox, mail_id) {

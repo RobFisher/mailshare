@@ -131,10 +131,12 @@ def mail_tags_bar_html(m, search_object):
     return result
 
 
-def mail_tags_multibar_html(search_object, mail_ids):
-    result = ''
+def mail_tags_multibar_html(search_object, mail_ids, tags_only=False):
     if len(mail_ids) == 0:
         return ''
+    result = ''
+    if not tags_only:
+        result += '<span id="multi_bar_tag_list">'
     tag_set = set([])
     for mail_id in mail_ids:
         try:
@@ -153,7 +155,9 @@ def mail_tags_multibar_html(search_object, mail_ids):
         result += ', '
         result += tag_to_html(t, search_object)
         result += tag_to_delete_html(-1, t)
-    result += add_tag_button_html(-1)
+    if not tags_only:
+        result += "</div>"
+        result += add_tag_button_html(-1)
     return result
 
 
