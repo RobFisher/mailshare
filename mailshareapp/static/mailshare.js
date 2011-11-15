@@ -139,7 +139,8 @@ function select_email(mail_id) {
 }
 
 function unselect_email(mail_id) {
-    selected_mails.splice(selected_mails.indexOf(mail_id), 1);
+    var index = $.inArray(mail_id, selected_mails)
+    selected_mails.splice(index, 1);
 }
 
 function get_multibar_update() {
