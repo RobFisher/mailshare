@@ -150,5 +150,5 @@ def get_multibar_tags(request, selected_mails, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     result = tags.mail_tags_multibar_html(search_object, selected_mails)
-    dajax.add_data({'tags_html':result, 'tags_only':False, 'tags_changed':False}, 'update_multibar')
+    dajax.add_data({'tags_html':result, 'tags_only':False, 'tags_changed':False, 'sm':selected_mails}, 'update_multibar')
     return dajax.json()
