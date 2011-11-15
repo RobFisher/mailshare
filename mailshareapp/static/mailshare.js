@@ -203,6 +203,26 @@ function invert_selection() {
 }
 
 
+function select_all_or_none() {
+    var select_all = true;
+    if(selected_mails.length > 0) {
+        select_all = false;
+    }
+    $(".mailcheck").each(function(i) {
+	var mail_id = parseInt(this.name.substr(6));
+        if(this.checked && !select_all) {
+            unselect_email(mail_id);
+            this.checked = false;
+        }
+        else if(!this.checked && select_all) {
+            select_email(mail_id);
+            this.checked = true;
+        }
+    });
+    get_multibar_update();
+}
+
+
 function document_ready_function() {
     $(".mailcheck").each(function(i) {
 	var mail_id = parseInt(this.name.substr(6));
