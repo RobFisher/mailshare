@@ -156,7 +156,7 @@ def mail_tags_multibar_html(search_object, mail_ids, tags_only=False):
         result += tag_to_html(t, search_object)
         result += tag_to_delete_html(-1, t)
     if not tags_only:
-        result += "</div>"
+        result += "</span>"
         result += add_tag_button_html(-1)
     return result
 
