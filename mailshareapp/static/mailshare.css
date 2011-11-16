@@ -80,3 +80,11 @@ tr.even {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+.not_common_tag {
+    color: #424242;
+}
+
+.not_common_tag a {
+    color: #424242;
+}

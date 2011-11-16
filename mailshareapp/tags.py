@@ -88,7 +88,7 @@ def tag_to_html(t, s=None):
 
 def tag_to_delete_html(mail_id, t):
     """Render a delete link for the specified mail and tag as HTML."""
-    result = '[<a href="#" onclick="delete_tag(' + str(mail_id) + ',' + str(t.id) + '); return false;">x</a>]'
+    result = '[<a href="#" title="Delete tag" onclick="delete_tag(' + str(mail_id) + ',' + str(t.id) + '); return false;">x</a>]'
     return result
 
 
@@ -137,24 +137,37 @@ def mail_tags_multibar_html(search_object, mail_ids, tags_only=False):
     result = ''
     if not tags_only:
         result += '<span id="multi_bar_tag_list">'
-    tag_set = set([])
+    all_tags = set([])
+    common_tags = set([])
+    first_mail = True
     for mail_id in mail_ids:
         try:
             m = models.Mail.objects.get(id=mail_id)
         except:
             pass
         else:
-            tags = m.tags.all()
-            for tag in tags:
-                tag_set.add(tag)
-    tags = sorted(tag_set, key=lambda t: t.name)
-    if len(tags) > 0:
-        result += tag_to_html(tags[0], search_object)
-        result += tag_to_delete_html(-1, tags[0])
-    for t in tags[1:]:
-        result += ', '
-        result += tag_to_html(t, search_object)
-        result += tag_to_delete_html(-1, t)
+            mail_tags = set(m.tags.all())
+            all_tags = all_tags | mail_tags
+            if first_mail:
+                common_tags = mail_tags
+                first_mail = False
+            else:
+                common_tags = common_tags & mail_tags
+
+    tags_list = sorted(all_tags, key=lambda t: t.name)
+    tags_html_list = []
+    for tag in tags_list:
+        tag_html = ''
+        common_tag = (tag in common_tags)
+        if not common_tag:
+            tag_html += '<span class="not_common_tag">'
+        tag_html += tag_to_html(tag, search_object)
+        tag_html += tag_to_delete_html(-1, tag)
+        if not common_tag:
+            tag_html += '[<a href="#" title="Add tag to all selected emails" onclick="add_tag_to_email(-1, \'' + tag.name + '\'); return false;">+</a>]</span>'
+        tags_html_list.append(tag_html)
+    result += ', '.join(tags_html_list)
+
     if not tags_only:
         result += "</span>"
         result += add_tag_button_html(-1)
