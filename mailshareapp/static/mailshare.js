@@ -110,6 +110,9 @@ var tag_select_callback=function tag_selected(email_id) {
 function update_tags(data) {
     $("#taglist_" + data.email_id).html(data.tags_html);
     $("#tagbox_" + data.email_id).val('');
+    if(data.propagate) {
+        get_multibar_update(false);
+    }
 }
 
 function tagbox_blur(email_id) {
@@ -142,8 +145,8 @@ function unselect_email(mail_id) {
     selected_mails.splice($.inArray(mail_id, selected_mails), 1);
 }
 
-function get_multibar_update() {
-    Dajaxice.mailshare.mailshareapp.get_multibar_tags(Dajax.process,{'selected_mails':selected_mails, 'url':location.href});
+function get_multibar_update(propagate) {
+    Dajaxice.mailshare.mailshareapp.get_multibar_tags(Dajax.process,{'selected_mails':selected_mails, 'propagate':propagate, 'url':location.href});
 }
 
 function update_multibar(data) {
@@ -161,7 +164,7 @@ function update_multibar(data) {
         $(identifier).html("Select emails to view and edit their tags.");
     }
     $("#tagbox_-1").val('');
-    if(data.tags_changed) {
+    if(data.tags_changed && data.propagate) {
 	update_open_mail_tags();
     }
 }
@@ -184,7 +187,7 @@ function checkbox_clicked(checkbox, mail_id) {
     else {
 	unselect_email(mail_id);
     }
-    get_multibar_update();
+    get_multibar_update(true);
 }
 
 function invert_selection() {
@@ -199,7 +202,7 @@ function invert_selection() {
 	    this.checked = true;
 	}
     });
-    get_multibar_update();
+    get_multibar_update(true);
 }
 
 
@@ -219,7 +222,7 @@ function select_all_or_none() {
             this.checked = true;
         }
     });
-    get_multibar_update();
+    get_multibar_update(true);
 }
 
 
@@ -231,7 +234,7 @@ function document_ready_function() {
 	}
     });
     if(selected_mails.length > 0) {
-        get_multibar_update();
+        get_multibar_update(true);
     }
 }
 
