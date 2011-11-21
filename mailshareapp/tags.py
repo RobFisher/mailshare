@@ -88,14 +88,14 @@ def tag_to_html(t, s=None):
 
 def tag_to_delete_html(mail_id, t):
     """Render a delete link for the specified mail and tag as HTML."""
-    result = '[<a href="#" title="Delete tag" onclick="delete_tag(' + str(mail_id) + ',' + str(t.id) + '); return false;">x</a>]'
+    result = '[<a href="#" title="Delete tag" onclick="fetch_delete_tag(' + str(mail_id) + ',' + str(t.id) + '); return false;">x</a>]'
     return result
 
 
 def undo_delete_html(mail_id, t):
     """Render an undo link for a deleted tag as HTML."""
     result = ' Tag ' + t.name + ' deleted ['
-    result += '<a href="#" onclick="add_tag_to_email(' + str(mail_id) + ',\'' + t.name + '\'); return false;">'
+    result += '<a href="#" onclick="fetch_add_tag(' + str(mail_id) + ',\'' + t.name + '\'); return false;">'
     result += 'undo</a>]'
     return result
 
@@ -164,7 +164,7 @@ def mail_tags_multibar_html(search_object, mail_ids, tags_only=False):
         tag_html += tag_to_html(tag, search_object)
         tag_html += tag_to_delete_html(-1, tag)
         if not common_tag:
-            tag_html += '[<a href="#" title="Add tag to all selected emails" onclick="add_tag_to_email(-1, \'' + tag.name + '\'); return false;">+</a>]</span>'
+            tag_html += '[<a href="#" title="Add tag to all selected emails" onclick="fetch_add_tag(-1, \'' + tag.name + '\'); return false;">+</a>]</span>'
         tags_html_list.append(tag_html)
     result += ', '.join(tags_html_list)
 

@@ -72,7 +72,7 @@ def mail_permalink_html(mail):
 
 def mail_delete_html(mail):
     """Generate delete link for a mail in HTML."""
-    result = '<a href="#" onclick="delete_mail(' + str(mail.id) + '); return false;">delete</a>'
+    result = '<a href="#" onclick="fetch_delete_mail(' + str(mail.id) + '); return false;">delete</a>'
     return result
 
 

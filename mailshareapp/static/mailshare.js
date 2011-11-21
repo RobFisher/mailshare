@@ -1,3 +1,5 @@
+/* License: https://github.com/RobFisher/mailshare/blob/master/LICENSE */
+
 function get_email_body_element(email_id) {
     element_selector = "#body_" + email_id;
     return $(element_selector)
@@ -28,7 +30,7 @@ function toggle_email_body(email_id) {
     element = get_email_body_element(email_id);
     if(element.hasClass("empty")) {
         element.toggleClass("empty showing");
-        fetch_email(email_id, $(element));
+        fetch_mail_body(email_id, $(element));
     }
     else if(element.hasClass("shown")) {
         element.toggleClass("shown hidden");
@@ -39,11 +41,11 @@ function toggle_email_body(email_id) {
     }
 }
 
-function fetch_email(email_id) {
-    Dajaxice.mailshare.mailshareapp.expand_email(Dajax.process,{'email_id':email_id,'url':location.href})
+function fetch_mail_body(email_id) {
+    Dajaxice.mailshare.mailshareapp.fetch_mail_body(Dajax.process,{'email_id':email_id,'url':location.href})
 }
 
-function set_email_body(data) {
+function update_mail_body(data) {
     element = get_email_body_element(data.email_id);
     element.html(data.email_body);
     element.toggleClass("showing shown");
@@ -53,10 +55,10 @@ function set_email_body(data) {
 tag_response_callback = null;
 function fetch_tag_completion(request, response) {
     tag_response_callback = response;
-    Dajaxice.mailshare.mailshareapp.tag_completion(Dajax.process,{'text':request.term});
+    Dajaxice.mailshare.mailshareapp.fetch_tag_completion(Dajax.process,{'text':request.term});
 }
 
-function set_tag_completion(data) {
+function update_tag_completion(data) {
     if(tag_response_callback) {
         tag_response_callback(data.tags);
     }
@@ -71,24 +73,24 @@ function add_tag(email_id) {
     tagbox.focus();
 }
 
-function add_tag_to_email(email_id, text) {
+function fetch_add_tag(email_id, text) {
     if(email_id == -1) {
-	Dajaxice.mailshare.mailshareapp.multi_add_tag(Dajax.process,{'selected_mails':selected_mails,'tag':text, 'url':location.href});
+	Dajaxice.mailshare.mailshareapp.fetch_multi_add_tag(Dajax.process,{'selected_mails':selected_mails,'tag':text, 'url':location.href});
     }
     else {
-	Dajaxice.mailshare.mailshareapp.add_tag(Dajax.process,{'email_id':email_id,'tag':text, 'url':location.href});
+	Dajaxice.mailshare.mailshareapp.fetch_add_tag(Dajax.process,{'email_id':email_id,'tag':text, 'url':location.href});
     }
 }
 
-function delete_tag(email_id, tag_id) {
+function fetch_delete_tag(email_id, tag_id) {
     if(email_id == -1) {
 	var answer = confirm("Deleting a tag from selected emails cannot be undone.");
         if(answer) {
-	    Dajaxice.mailshare.mailshareapp.multi_delete_tag(Dajax.process,{'selected_mails':selected_mails,'tag_id':tag_id, 'url':location.href});
+	    Dajaxice.mailshare.mailshareapp.fetch_multi_delete_tag(Dajax.process,{'selected_mails':selected_mails,'tag_id':tag_id, 'url':location.href});
         }
     }
     else {
-        Dajaxice.mailshare.mailshareapp.delete_tag(Dajax.process,{'email_id':email_id,'tag_id':tag_id, 'url':location.href});
+        Dajaxice.mailshare.mailshareapp.fetch_delete_tag(Dajax.process,{'email_id':email_id,'tag_id':tag_id, 'url':location.href});
     }
     return false;
 }
@@ -96,14 +98,14 @@ function delete_tag(email_id, tag_id) {
 function tag_key(event, email_id) {
     if(event.keyCode == 13) {
         tagbox=$("#tagbox_" + email_id);
-        add_tag_to_email(email_id, tagbox.val());
+        fetch_add_tag(email_id, tagbox.val());
     }
 }
 
 /* for explanation see http://stackoverflow.com/questions/939032/jquery-pass-more-parameters-into-callback */
 var tag_select_callback=function tag_selected(email_id) {
     return function(event, ui) {
-        add_tag_to_email(email_id, ui.item.value);
+        fetch_add_tag(email_id, ui.item.value);
     }
 }
 
@@ -111,7 +113,7 @@ function update_tags(data) {
     $("#taglist_" + data.email_id).html(data.tags_html);
     $("#tagbox_" + data.email_id).val('');
     if(data.propagate) {
-        get_multibar_update(false);
+        fetch_multibar(false);
     }
 }
 
@@ -120,14 +122,14 @@ function tagbox_blur(email_id) {
     $("#tagbutton_" + email_id).toggleClass("shown hidden");
 }
 
-function delete_mail(email_id) {
+function fetch_delete_mail(email_id) {
     var answer = confirm("This will permanently delete the email from the Mailshare database.");
     if(answer) {
-	Dajaxice.mailshare.mailshareapp.delete_email(Dajax.process,{'email_id':email_id});
+	Dajaxice.mailshare.mailshareapp.fetch_delete_mail(Dajax.process,{'email_id':email_id});
     }
 }
 
-function mail_deleted(success) {
+function update_delete_mail(success) {
     if(success) {
 	window.location.reload();
     }
@@ -145,8 +147,8 @@ function unselect_email(mail_id) {
     selected_mails.splice($.inArray(mail_id, selected_mails), 1);
 }
 
-function get_multibar_update(propagate) {
-    Dajaxice.mailshare.mailshareapp.get_multibar_tags(Dajax.process,{'selected_mails':selected_mails, 'propagate':propagate, 'url':location.href});
+function fetch_multibar(propagate) {
+    Dajaxice.mailshare.mailshareapp.fetch_multibar(Dajax.process,{'selected_mails':selected_mails, 'propagate':propagate, 'url':location.href});
 }
 
 function update_multibar(data) {
@@ -165,14 +167,14 @@ function update_multibar(data) {
     }
     $("#tagbox_-1").val('');
     if(data.tags_changed && data.propagate) {
-	update_open_mail_tags();
+	fetch_open_mail_tags();
     }
 }
 
-function update_open_mail_tags() {
+function fetch_open_mail_tags() {
     $('span[id^="taglist_"]').each(function(i) {
         var email_id = parseInt(this.id.substr(8));
-	Dajaxice.mailshare.mailshareapp.get_email_tags(Dajax.process,{'email_id':email_id, 'url':location.href});
+	Dajaxice.mailshare.mailshareapp.fetch_mail_tags(Dajax.process,{'email_id':email_id, 'url':location.href});
     });
 }
 
@@ -187,7 +189,7 @@ function checkbox_clicked(checkbox, mail_id) {
     else {
 	unselect_email(mail_id);
     }
-    get_multibar_update(true);
+    fetch_multibar(true);
 }
 
 function invert_selection() {
@@ -202,9 +204,8 @@ function invert_selection() {
 	    this.checked = true;
 	}
     });
-    get_multibar_update(true);
+    fetch_multibar(true);
 }
-
 
 function select_all_or_none() {
     var select_all = true;
@@ -222,9 +223,8 @@ function select_all_or_none() {
             this.checked = true;
         }
     });
-    get_multibar_update(true);
+    fetch_multibar(true);
 }
-
 
 function document_ready_function() {
     $(".mailcheck").each(function(i) {
@@ -234,7 +234,7 @@ function document_ready_function() {
 	}
     });
     if(selected_mails.length > 0) {
-        get_multibar_update(true);
+        fetch_multibar(true);
     }
 }
 

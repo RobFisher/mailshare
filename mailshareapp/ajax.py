@@ -1,3 +1,5 @@
+# License: https://github.com/RobFisher/mailshare/blob/master/LICENSE
+
 import datetime
 import logging
 from dajax.core import Dajax
@@ -8,20 +10,23 @@ from views import get_expanded_html
 import tags
 import search
 
+# Naming convention: calls from browser to server are prefixed with 'fetch';
+# calls from server to browser are prefixed with 'update'.
+
 @dajaxice_register
-def expand_email(request, email_id, url):
+def fetch_mail_body(request, email_id, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     email_body = 'Error retrieving email'
     email = Mail.objects.get(pk=email_id)
     if(email):
         email_body=get_expanded_html(email, search_object)
-    dajax.add_data({'email_id':email_id, 'email_body':email_body}, 'set_email_body')
+    dajax.add_data({'email_id':email_id, 'email_body':email_body}, 'update_mail_body')
     return dajax.json()
 
 
 @dajaxice_register
-def get_email_tags(request, email_id, url):
+def fetch_mail_tags(request, email_id, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     try:
@@ -40,7 +45,7 @@ def update_tag_cloud(dajax, search_object):
 
 
 @dajaxice_register
-def add_tag(request, email_id, tag, url):
+def fetch_add_tag(request, email_id, tag, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     mails = Mail.objects.filter(id=email_id)
@@ -54,7 +59,7 @@ def add_tag(request, email_id, tag, url):
 
 
 @dajaxice_register
-def delete_tag(request, email_id, tag_id, url):
+def fetch_delete_tag(request, email_id, tag_id, url):
     dajax = Dajax()
     try:
         mail = Mail.objects.get(id=email_id)
@@ -72,7 +77,7 @@ def delete_tag(request, email_id, tag_id, url):
 
 
 @dajaxice_register
-def multi_add_tag(request, selected_mails, tag, url):
+def fetch_multi_add_tag(request, selected_mails, tag, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     t = tags.get_or_create_tag(tag)
@@ -90,7 +95,7 @@ def multi_add_tag(request, selected_mails, tag, url):
 
 
 @dajaxice_register
-def multi_delete_tag(request, selected_mails, tag_id, url):
+def fetch_multi_delete_tag(request, selected_mails, tag_id, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     try:
@@ -112,7 +117,7 @@ def multi_delete_tag(request, selected_mails, tag_id, url):
 
 
 @dajaxice_register
-def tag_completion(request, text):
+def fetch_tag_completion(request, text):
     dajax = Dajax()
     tags = None
     if len(text) == 1:
@@ -122,12 +127,12 @@ def tag_completion(request, text):
     response = []
     for tag in tags:
         response.append(tag.name)
-    dajax.add_data({'tags':response}, 'set_tag_completion')
+    dajax.add_data({'tags':response}, 'update_tag_completion')
     return dajax.json()
 
 
 @dajaxice_register
-def delete_email(request, email_id):
+def fetch_delete_mail(request, email_id):
     dajax = Dajax()
     logger = logging.getLogger('ajax')
     success = False
@@ -141,12 +146,12 @@ def delete_email(request, email_id):
             mail.delete()
             success = True
 
-    dajax.add_data({'success':success}, 'mail_deleted')
+    dajax.add_data({'success':success}, 'update_delete_mail')
     return dajax.json()
 
 
 @dajaxice_register
-def get_multibar_tags(request, selected_mails, propagate, url):
+def fetch_multibar(request, selected_mails, propagate, url):
     dajax = Dajax()
     search_object = search.get_search_from_url(url)
     result = tags.mail_tags_multibar_html(search_object, selected_mails)
