@@ -46,7 +46,7 @@ def get_expanded_html(mail, current_search=None):
     """Return the HTML representing the expanded email."""
     expanded_html = email_utils.mail_contacts_bar_html(mail, current_search)
     expanded_html += tags.mail_tags_bar_html(mail, current_search)
-    expanded_html += email_utils.mail_body_html(mail)
+    expanded_html += email_utils.mail_iframe_html(mail)
     return expanded_html
 
 
@@ -72,3 +72,10 @@ def search_view(request):
         'results' : s.get_query_set(),
     })
     return HttpResponse(t.render(c))
+
+
+def mail_body_view(request):
+    mail_id = int(request.GET['mail_id'])
+    mail = Mail.objects.get(id=mail_id)
+    body = email_utils.mail_body_html(mail)
+    return HttpResponse(body)

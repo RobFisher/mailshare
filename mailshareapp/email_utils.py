@@ -38,6 +38,11 @@ def mail_body_html(mail):
         return plaintext2html(mail.body)
 
 
+def mail_iframe_html(mail):
+    """Given a mailshareapp.models.Mail object, return a HTML iframe that will fetch its ."""
+    return '<iframe src="/body?mail_id=' + str(mail.id) + '" width="100%" frameBorder="0" />'
+
+
 def contact_to_html(contact, search_object=None):
     """Given a mailshareapp.models.Contact object, return a string representing it in HTML."""
     sender_search = search.get_contact_id_search(contact.id)
