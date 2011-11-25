@@ -2,7 +2,6 @@
 
 import re
 import math
-from django.utils.html import strip_tags
 from django.db.models import Q
 import models
 import search
@@ -41,17 +40,21 @@ def add_autotags_to_mail(m):
 
 user_tags_expression = r'tags:\s*([,-\.\w ]*)'
 user_tags_compiled = re.compile(user_tags_expression, re.IGNORECASE)
+outlook_linefeed = re.compile(r'\r\n')
+html_entity = re.compile(r'&\w*;')
 
 def add_usertags_to_mail(m):
     body = m.body
     # strip html tags from HTML emails before parsing out Mailshare tags
     if m.content_type.find('html') != -1:
-        body = strip_tags(m.body)
+        body = re.sub(outlook_linefeed, '', body)
+        body = re.sub(html_entity, '', body)
     taglists = re.findall(user_tags_compiled, body)
     for taglist in taglists:
         tags = taglist.split(',')
         for tag in tags:
-            if len(tag) <= models.Tag.MAX_TAG_NAME_LENGTH:
+            tag = tag.strip()
+            if len(tag) <= models.Tag.MAX_TAG_NAME_LENGTH and len(tag) > 0:
                 add_tag_by_name(m, tag)
 
 
