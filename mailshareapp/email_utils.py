@@ -40,7 +40,11 @@ def mail_body_html(mail):
 
 def mail_iframe_html(mail):
     """Given a mailshareapp.models.Mail object, return a HTML iframe that will fetch its ."""
-    return '<iframe src="/body?mail_id=' + str(mail.id) + '" width="100%" frameBorder="0" />'
+    mail_id_str = str(mail.id)
+    result = '<iframe src="/body?mail_id=' + mail_id_str + '" width="100%" frameBorder="0" '
+    result += 'id="body_frame_' + mail_id_str + '" onLoad="resize_iframe(' + mail_id_str + ')" '
+    result += 'scrolling="no" />'
+    return result
 
 
 def contact_to_html(contact, search_object=None):

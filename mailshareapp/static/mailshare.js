@@ -49,7 +49,6 @@ function update_mail_body(data) {
     element = get_email_body_element(data.email_id);
     element.html(data.email_body);
     element.toggleClass("showing shown");
-    scroll_to_row(element);
 }
 
 tag_response_callback = null;
@@ -224,6 +223,13 @@ function select_all_or_none() {
         }
     });
     fetch_multibar(true);
+}
+
+function resize_iframe(mail_id) {
+    var iframe = document.getElementById("body_frame_" + mail_id);
+    iframe.style.height = (iframe.contentWindow.document.body.offsetHeight+10) + "px";
+    element = get_email_body_element(mail_id);
+    scroll_to_row(element);
 }
 
 function document_ready_function() {
