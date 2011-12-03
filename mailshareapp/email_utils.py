@@ -38,11 +38,15 @@ def mail_body_html(mail):
         return plaintext2html(mail.body)
 
 
-def mail_iframe_html(mail):
+def mail_iframe_html(mail, scroll_on_load=True):
     """Given a mailshareapp.models.Mail object, return a HTML iframe that will fetch its ."""
     mail_id_str = str(mail.id)
+    scroll_on_load_str = 'true'
+    if not scroll_on_load:
+        scroll_on_load_str = 'false'
     result = '<iframe src="/body?mail_id=' + mail_id_str + '" width="100%" frameBorder="0" '
-    result += 'id="body_frame_' + mail_id_str + '" onLoad="resize_iframe(' + mail_id_str + ')" '
+    result += 'id="body_frame_' + mail_id_str + '" onLoad="resize_iframe(' + mail_id_str
+    result += ', ' + scroll_on_load_str  + ')" '
     result += 'scrolling="no" />'
     return result
 

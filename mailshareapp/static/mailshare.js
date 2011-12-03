@@ -225,11 +225,13 @@ function select_all_or_none() {
     fetch_multibar(true);
 }
 
-function resize_iframe(mail_id) {
+function resize_iframe(mail_id, scroll) {
     var iframe = document.getElementById("body_frame_" + mail_id);
     iframe.style.height = (iframe.contentWindow.document.body.offsetHeight+10) + "px";
     element = get_email_body_element(mail_id);
-    scroll_to_row(element);
+    if(scroll) {
+        scroll_to_row(element);
+    }
 }
 
 function document_ready_function() {
