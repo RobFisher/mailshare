@@ -7,7 +7,7 @@ import sys
 import time
 import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Contact, Tag
-from tags import add_tags_to_mail
+from tags import add_tags_to_mail, add_regex_tags_to_mail
 
 def get_body(message):
     """Search all the MIME parts of the and return a tuple consisting of the content type and text of the body.
@@ -144,6 +144,13 @@ def test_email(n):
     print "Content type: " + content_type
     print body
     return messages[n]
+
+
+def apply_all_regex_tags(test_mode):
+    mails = Mail.objects.all()
+    for mail in mails:
+        add_regex_tags_to_mail(mail, test_mode)
+
 
 def poll_emails(verbose=False):
     mail_file = open(mail_file_name, 'a')

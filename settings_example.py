@@ -27,6 +27,10 @@ MAILSHARE_IMAP_PASSWORD = ''
 MAILSHARE_IMAP_MAILBOX = 'INBOX'
 MAILSHARE_IMAP_ENABLE_EXPUNGE = False
 MAILSHARE_ENABLE_DELETE = False
+MAILSHARE_TAGS_REGEX = [
+    # mailshare will tag incoming emails with any text in the subject or body
+    # that matches any regular expression in this list
+]
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

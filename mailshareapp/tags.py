@@ -2,9 +2,11 @@
 
 import re
 import math
+from django.utils.html import strip_tags
 from django.db.models import Q
 import models
 import search
+import settings
 
 def get_or_create_tag(tag_name):
     """Return tag with the specified name, creating it if it doesn't exist."""
@@ -58,12 +60,35 @@ def add_usertags_to_mail(m):
                 add_tag_by_name(m, tag)
 
 
+regex_tags_compiled = []
+for regex_tag in settings.MAILSHARE_TAGS_REGEX:
+    regex_tag_compiled = re.compile(regex_tag, re.IGNORECASE)
+    regex_tags_compiled.append(regex_tag_compiled)
+
+
+def add_regex_tags_to_mail(m, test=False):
+    global regex_tags_compiled
+    body = strip_tags(m.body)
+    tags_to_add = set()
+    for regex in regex_tags_compiled:
+        regex_matches = re.findall(regex, m.subject)
+        regex_matches += re.findall(regex, body)
+        for match in regex_matches:
+            tags_to_add.add(match)
+        if test and len(tags_to_add) > 0:
+            print 'Mail ' + str(m.id) + ' would add tag ' + str(tags_to_add)
+        else:
+            for tag in tags_to_add:
+                add_tag_by_name(m, tag)
+
+
 def add_tags_to_mail(m):
     """Add tags to a mailshareapp.models.Mail object. This includes tags that appear in
     the email subject or body that have their auto attribute set, and tags added by
     the user by typing "tags:" in an email."""
     add_autotags_to_mail(m)
     add_usertags_to_mail(m)
+    add_regex_tags_to_mail(m)
 
 
 def apply_autotag(tag):
