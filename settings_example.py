@@ -31,6 +31,7 @@ MAILSHARE_TAGS_REGEX = [
     # mailshare will tag incoming emails with any text in the subject or body
     # that matches any regular expression in this list
 ]
+MAILSHARE_FOOTNOTE = '<p>For more information see <a href="https://github.com/RobFisher/mailshare">Mailshare on Github</a></p>.'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

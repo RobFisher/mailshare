@@ -8,6 +8,7 @@ from mailshareapp.models import Mail, Contact, Tag
 import search
 import email_utils
 import tags
+import settings
 
 
 def index_view(request):
@@ -19,6 +20,7 @@ def index_view(request):
     c = RequestContext(request, {
             'tag_cloud': tag_cloud,
             'hidden_form': month_search.get_hidden_form_html(),
+            'footnote' : settings.MAILSHARE_FOOTNOTE,
     })
     return HttpResponse(t.render(c))
 
