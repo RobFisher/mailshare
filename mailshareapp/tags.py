@@ -40,7 +40,7 @@ def add_autotags_to_mail(m):
             m.tags.add(t)
 
 
-user_tags_expression = r'tags:\s*([,-\.\w ]*)'
+user_tags_expression = r'tags?:\s*([,-\.\w ]*)'
 user_tags_compiled = re.compile(user_tags_expression, re.IGNORECASE)
 outlook_linefeed = re.compile(r'\r\n')
 html_entity = re.compile(r'&\w*;')
