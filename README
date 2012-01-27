@@ -116,6 +116,7 @@ sudo apt-get install mysql
 sudo cp mailshare/mysql/mailshare.cnf /etc/mysql/conf.d/
 sudo service mysql restart
 sudo apt-get install apache2
+sudo apt-get install apache2 libapache2-mod-wsgi
 sudo apt-get install python-setuptools
 sudo easy_install django
 sudo easy_install django-dajaxice
@@ -140,7 +141,7 @@ mysql> quit
 python manage.py syncdb
 mysql -u root -p
 mysql> USE mailshare;
-mysql> ALTER TABLE mailshareapp_mail ADD FULLTEXT(body, subject)
+mysql> ALTER TABLE mailshareapp_mail ADD FULLTEXT(body, subject);
 bmysql> quit
 
 # whenever you change source code (including settings.py):
