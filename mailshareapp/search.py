@@ -185,7 +185,7 @@ class _RecipientParameter(_ContactParameter):
 
 
     def get_query(self):
-        return Q(to__id=self.cid)
+        return Q(to__id=self.cid) | Q(cc__id=self.cid)
 
 
     def get_html(self):
