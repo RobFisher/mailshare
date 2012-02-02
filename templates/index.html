@@ -7,9 +7,11 @@
 <head>
 <title>Mailshare</title>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}mailshare.css" />
-<script src="{{ STATIC_URL }}jquery.js"></script>
+<script src="{{ STATIC_URL }}jquery/jquery-1.6.4.js"></script>
 {% dajaxice_js_import %}
 <script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}mailshare_index.js"></script>
+
 </head>
 <body>
 <h1>Mailshare</h1>
@@ -31,8 +33,7 @@
 <input id="submit" type="submit" value="Search" />
 </form>
 <p>Tag cloud from emails in the last week:</p>
-<div class="tag_cloud">
-    {% autoescape off %}{{ tag_cloud }}{% endautoescape %}
+<div id="tag_cloud" class="tag_cloud">
 </div>
 {% autoescape off %}{{ footnote }}{% endautoescape %}
 </body>

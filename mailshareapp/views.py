@@ -13,10 +13,7 @@ import teams
 
 
 def index_view(request):
-    week_search = search.get_days_search(7)
-    last_week_emails = week_search.get_query_set()
     month_search = search.get_days_search(30)
-    tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails, month_search)
     t = loader.get_template('index.html')
     default_team_id = 0
     if request.COOKIES.has_key('team'):
@@ -24,7 +21,6 @@ def index_view(request):
     c = RequestContext(request, {
             'teams': teams.teams,
             'selected_team_id':default_team_id,
-            'tag_cloud': tag_cloud,
             'hidden_form': month_search.get_hidden_form_html(),
             'footnote' : settings.MAILSHARE_FOOTNOTE,
     })

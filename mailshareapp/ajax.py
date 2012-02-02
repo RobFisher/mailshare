@@ -157,3 +157,14 @@ def fetch_multibar(request, selected_mails, propagate, url):
     result = tags.mail_tags_multibar_html(search_object, selected_mails)
     dajax.add_data({'tags_html':result, 'tags_only':False, 'tags_changed':False, 'propagate':propagate}, 'update_multibar')
     return dajax.json()
+
+
+@dajaxice_register
+def fetch_index_tag_cloud(request):
+    dajax = Dajax()
+    week_search = search.get_days_search(7)
+    last_week_emails = week_search.get_query_set()
+    month_search = search.get_days_search(30)
+    tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails, month_search)
+    dajax.add_data({'tag_cloud_html':tag_cloud}, 'update_index_tag_cloud')
+    return dajax.json()
