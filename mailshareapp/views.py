@@ -80,5 +80,6 @@ def search_view(request):
         'results' : s.get_query_set(),
     })
     response = HttpResponse(t.render(c))
-    response.set_cookie('team', request.GET['recipient-2'])
+    if request.GET.has_key('recipient-2'):
+        response.set_cookie('team', request.GET['recipient-2'])
     return response
