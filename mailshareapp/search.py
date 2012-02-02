@@ -30,8 +30,6 @@ class _Parameter(object):
 
 
     def get_url_param(self):
-        print "value = " + self.string_value
-        print "  url = " + urlquote(self.string_value)
         url = self.get_url_parameter_name() + '=' + urlquote(self.string_value)
         return url
 
