@@ -18,6 +18,16 @@
     {% autoescape off %}{{ hidden_form }}{% endautoescape %}
 {% endif %}
 <input id="query" name="query-1" value="" />
+
+{% if teams|length > 0 %}
+<select name="recipient-2">
+    <option value="0">All</option>
+    {% for team in teams %}
+        <option value="{{ team.contact_id }}">{{ team.name }}</option>
+    {% endfor %}
+</select>
+{% endif %}
+
 <input id="submit" type="submit" value="Search" />
 </form>
 <p>Tag cloud from emails in the last week:</p>

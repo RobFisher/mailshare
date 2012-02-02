@@ -32,6 +32,10 @@ MAILSHARE_TAGS_REGEX = [
     # that matches any regular expression in this list
 ]
 MAILSHARE_FOOTNOTE = '<p>For more information see <a href="https://github.com/RobFisher/mailshare">Mailshare on Github</a></p>.'
+MAILSHARE_TEAMS = {
+    # A dictionary of team names to team email addresses will allow searching for
+    # emails sent to the team email address.
+}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

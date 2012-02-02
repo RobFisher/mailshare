@@ -9,6 +9,7 @@ import search
 import email_utils
 import tags
 import settings
+import teams
 
 
 def index_view(request):
@@ -18,6 +19,7 @@ def index_view(request):
     tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails, month_search)
     t = loader.get_template('index.html')
     c = RequestContext(request, {
+            'teams': teams.teams,
             'tag_cloud': tag_cloud,
             'hidden_form': month_search.get_hidden_form_html(),
             'footnote' : settings.MAILSHARE_FOOTNOTE,

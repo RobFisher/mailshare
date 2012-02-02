@@ -305,7 +305,9 @@ def _expand_search_parameters(search_parameters):
     result = []
     for (key, value) in search_parameters:
         (name, index) = _get_parameter_name_and_index(key)
-        result.append((name, index, value))
+        # filter out recipient=0 searches which result from selecting "All" teams
+        if name != 'recipient' or value != '0':
+            result.append((name, index, value))
     return result
 
 
