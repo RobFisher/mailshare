@@ -8,10 +8,8 @@ class Team(object):
         self.name = name
         self.address = address
         matching_contacts = Contact.objects.filter(address__iexact=self.address)
-        print self.address + ' matches ' + str(matching_contacts)
         if len(matching_contacts) > 0:
             self.contact_id = matching_contacts[0].id
-            print 'ID = ' + str(self.contact_id)
         else:
             self.contact_id = -1
 
