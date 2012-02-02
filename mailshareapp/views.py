@@ -18,8 +18,12 @@ def index_view(request):
     month_search = search.get_days_search(30)
     tag_cloud = tags.search_results_to_tag_cloud_html(last_week_emails, month_search)
     t = loader.get_template('index.html')
+    default_team_id = 0
+    if request.COOKIES.has_key('team'):
+        default_team_id = int(request.COOKIES['team'])
     c = RequestContext(request, {
             'teams': teams.teams,
+            'selected_team_id':default_team_id,
             'tag_cloud': tag_cloud,
             'hidden_form': month_search.get_hidden_form_html(),
             'footnote' : settings.MAILSHARE_FOOTNOTE,
@@ -75,4 +79,6 @@ def search_view(request):
         'expanded_html': expanded_html,
         'results' : s.get_query_set(),
     })
-    return HttpResponse(t.render(c))
+    response = HttpResponse(t.render(c))
+    response.set_cookie('team', request.GET['recipient-2'])
+    return response

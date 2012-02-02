@@ -23,7 +23,7 @@
 <select name="recipient-2">
     <option value="0">All</option>
     {% for team in teams %}
-        <option value="{{ team.contact_id }}">{{ team.name }}</option>
+        <option value="{{ team.contact_id }}" {% ifequal selected_team_id team.contact_id %}selected="selected"{% endifequal %}>{{ team.name }}</option>
     {% endfor %}
 </select>
 {% endif %}
