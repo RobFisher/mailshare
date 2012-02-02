@@ -5,6 +5,8 @@
 import datetime
 from django.db.models import Q
 from django.http import QueryDict
+from django.utils.http import urlquote
+from django.utils.html import escape
 import models
 import email_utils
 import tags
@@ -28,7 +30,9 @@ class _Parameter(object):
 
 
     def get_url_param(self):
-        url = self.get_url_parameter_name() + '=' + self.string_value
+        print "value = " + self.string_value
+        print "  url = " + urlquote(self.string_value)
+        url = self.get_url_parameter_name() + '=' + urlquote(self.string_value)
         return url
 
 
@@ -54,7 +58,7 @@ class _Parameter(object):
         html = '<input type="hidden" name="'
         html += self.get_url_parameter_name()
         html += '" value="'
-        html += self.string_value
+        html += escape(self.string_value)
         html += '" />'
         return html
 
