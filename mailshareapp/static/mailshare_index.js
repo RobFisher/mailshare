@@ -1,7 +1,9 @@
 /* License: https://github.com/RobFisher/mailshare/blob/master/LICENSE */
 
 function fetch_index_tag_cloud() {
-    Dajaxice.mailshare.mailshareapp.fetch_index_tag_cloud(Dajax.process);
+    team_box = $("#team");
+    team_id = team_box.val();
+    Dajaxice.mailshare.mailshareapp.fetch_index_tag_cloud(Dajax.process,{'team_id':team_id});
 }
 
 function document_ready_function() {

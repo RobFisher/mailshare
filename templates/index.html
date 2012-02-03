@@ -22,7 +22,7 @@
 <input id="query" name="query-1" value="" />
 
 {% if teams|length > 0 %}
-<select name="recipient-2">
+<select id="team" title="Filter results by team" name="recipient-2" onchange="fetch_index_tag_cloud();" onkeyup="fetch_index_tag_cloud();">
     <option value="0">All</option>
     {% for team in teams %}
         <option value="{{ team.contact_id }}" {% ifequal selected_team_id team.contact_id %}selected="selected"{% endifequal %}>{{ team.name }}</option>
