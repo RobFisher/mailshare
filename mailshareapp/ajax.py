@@ -164,7 +164,7 @@ def fetch_index_tag_cloud(request, team_id):
     dajax = Dajax()
     team_search = search.get_team_search(team_id, 7)
     team_emails = team_search.get_query_set()
-    month_search = search.get_days_search(30)
+    month_search = search.get_team_search(team_id, 30)
     tag_cloud = tags.search_results_to_tag_cloud_html(team_emails, month_search)
     dajax.add_data({'tag_cloud_html':tag_cloud}, 'update_index_tag_cloud')
     return dajax.json()
