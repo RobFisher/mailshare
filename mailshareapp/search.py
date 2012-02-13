@@ -583,7 +583,7 @@ def get_days_search(days):
 
 def get_team_search(contact_id, days):
     """Return new Search object representing a search for mails sent to the specified contact in the last days days."""
-    return Search([(_RecipientParameter.parameter_name, str(contact_id)), (_AgeInDaysParameter.parameter_name, str(days))])
+    return Search([(_RecipientParameter.parameter_name + '-1', str(contact_id)), (_AgeInDaysParameter.parameter_name, str(days))])
 
 
 def get_search_from_url(url):
