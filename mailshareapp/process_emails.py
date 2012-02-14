@@ -49,12 +49,45 @@ def get_or_add_contact(name, address):
     contact_list = Contact.objects.filter(address__iexact=address)
     result = None
     if len(contact_list) == 0:
+        name = convert_name_to_utf8(name)
         contact = Contact(name=name, address=address)
         contact.save()
         result = contact
     else:
         result = contact_list[0]
     return result
+
+
+def strip_strange_whitespace(addresses):
+    """
+    Remove tabs and newlines from email address headers. Outlook seems to put these here.
+    """
+    fixed = []
+    for a in addresses:
+        a = a.replace('\r', ' ')
+        a = a.replace('\n', ' ')
+        a = a.replace('\t', ' ')
+        fixed.append(a)
+    return fixed
+
+
+def convert_name_to_utf8(name):
+    """
+    Convert the email names to utf-8.
+    """
+    encoded_list = email.header.decode_header(name)
+    # although the above function is called decode_header, it has decoded the
+    # email specific way of representing unicode into a list of tuples, each
+    # entry of which contains an encoded unicode string and its encoding
+    unicode_binary = u''
+    for (encoded_string, encoding) in encoded_list:
+        if encoding:
+            unicode_binary += encoded_string.decode(encoding)
+        else:
+            unicode_binary += encoded_string
+    # at this point, unicode_binary is a Python unicode string that has
+    # not been encoded.
+    return unicode_binary.encode('utf-8')
 
 
 def add_contacts_to_mail(address_field, address_headers):
@@ -64,6 +97,7 @@ def add_contacts_to_mail(address_field, address_headers):
     address_header: headers retrieved with email.email.Message.get_all
     """
     if address_headers != None:
+        address_headers = strip_strange_whitespace(address_headers)
         addresses = email.utils.getaddresses(address_headers)
         for (name, address) in addresses:
             contact = get_or_add_contact(name, address)
