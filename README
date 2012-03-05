@@ -67,12 +67,12 @@ Once you are happy that the IMAP connection is working, you can start
 the full email polling process. In settings.py, make sure that
 MAILSHARE_IMAP_ENABLE_EXPUNGE is set to True. Then:
 
-python manage.py shell
->>> import mailshareapp.process_emails
->>> mailshareapp.process_emails.poll_emails(True)
+poll_mail.sh
 
-This runs forever, retrieving 10 emails at a time, adding them to the
-database, then deleting them.
+This just calls poll_mail.py which sets up the Django environment then
+runs mailshareapp.process_emails.poll_emails which runs forever,
+retrieving 10 emails at a time, adding them to the database, then
+deleting them.
 
 Environment
 ===========
