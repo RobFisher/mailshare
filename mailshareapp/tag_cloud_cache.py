@@ -3,6 +3,7 @@ from mailshareapp.models import Mail, Contact, Tag
 import tags
 import search
 import os
+import teams
 
 def _get_tag_cloud_html(team_id):
     team_search = search.get_team_search(team_id, 7)
@@ -41,6 +42,17 @@ def update_cached_tag_cloud(team_id):
     except IOError:
         pass
     return html
+
+
+def update_cached_tag_clouds_by_contacts(contacts, verbose=False):
+    """Update all the caches affected by the specified set of contacts."""
+    for contact in contacts:
+        if contact.id in teams.teams_by_contact_id:
+            if verbose:
+                print "Updating tag cloud cache for team " + teams.teams_by_contact_id[contact.id].name
+            update_cached_tag_cloud(contact.id)
+            if verbose:
+                print "Done."
 
 
 def get_cached_tag_cloud(team_id):
