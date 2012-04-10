@@ -37,6 +37,10 @@ MAILSHARE_TEAMS = {
     # emails sent to the team email address.
 }
 
+# This directory should be writeable by the web server so we can cache data
+# in it.
+MAILSHARE_CACHE_PATH='/srv/www/mailshare/cache'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.

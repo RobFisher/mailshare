@@ -144,5 +144,9 @@ mysql> USE mailshare;
 mysql> ALTER TABLE mailshareapp_mail ADD FULLTEXT(body, subject);
 bmysql> quit
 
+# The web server needs permission to write into the cache directory
+sudo chgrp www-data cache
+chmod ug+w cache
+
 # whenever you change source code (including settings.py):
 touch mailshare/apache/mailshare.wsgi
