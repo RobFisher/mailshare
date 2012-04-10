@@ -17,7 +17,9 @@ class Team(object):
 team_names = settings.MAILSHARE_TEAMS.keys()
 team_names.sort()
 teams = []
+teams_by_contact_id = {}
 
 for team_name in team_names:
     team = Team(team_name, settings.MAILSHARE_TEAMS[team_name])
     teams.append(team)
+    teams_by_contact_id[team.contact_id] = team

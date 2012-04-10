@@ -8,6 +8,7 @@ import time
 import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Contact, Tag
 from tags import add_tags_to_mail, add_regex_tags_to_mail
+import tag_cloud_cache
 
 def get_body(message):
     """Search all the MIME parts of the and return a tuple consisting of the content type and text of the body.
@@ -95,13 +96,17 @@ def add_contacts_to_mail(address_field, address_headers):
     Parse out email addresses and add them to the Mail table.
     address_field: a ManyToManyField linked to the Contact table
     address_header: headers retrieved with email.email.Message.get_all
+    Returns a set of added contacts.
     """
+    contact_set = set()
     if address_headers != None:
         address_headers = strip_strange_whitespace(address_headers)
         addresses = email.utils.getaddresses(address_headers)
         for (name, address) in addresses:
             contact = get_or_add_contact(name, address)
             address_field.add(contact)
+            contact_set.add(contact)
+    return contact_set
 
 
 def datetime_from_email_date(email_date):
@@ -128,9 +133,14 @@ def get_if_present(message, header):
 
 
 def add_message_to_database(message):
-    """Add the message to the database if it is unique according to its Message-ID field."""
+    """
+    Add the message to the database if it is unique according to its Message-ID field.
+
+    Returns a set of contacts who are recipients of the message.
+    """
     message_id = message.get('Message-ID')
     matching_messages = Mail.objects.filter(message_id__exact=message_id)
+    contact_set = set()
     if len(matching_messages) == 0:
         m = Mail()
         m.sender = get_or_add_contact(*email.utils.parseaddr(message.get('from')))
@@ -144,9 +154,12 @@ def add_message_to_database(message):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             m.save()
-        add_contacts_to_mail(m.to, message.get_all('to'))
-        add_contacts_to_mail(m.cc, message.get_all('cc'))
+        contacts = add_contacts_to_mail(m.to, message.get_all('to'))
+        contact_set |= contacts
+        contacts = add_contacts_to_mail(m.cc, message.get_all('cc'))
+        contact_set |= contacts
         add_tags_to_mail(m)
+    return contact_set
 
 
 def print_message_headers(message):
@@ -189,11 +202,14 @@ def apply_all_regex_tags(test_mode):
 def poll_emails(verbose=False):
     mail_file = open(mail_file_name, 'a')
     while True:
+        contact_set = set()
         messages = poll_imap_email.fetch_messages(10, mail_file, True)
         for message in messages:
             if verbose:
                 print_message_headers(message)
-            add_message_to_database(message)
+            contacts = add_message_to_database(message)
+            contact_set |= contacts
+        tag_cloud_cache.update_cached_tag_clouds_by_contacts(contact_set, verbose)
         time.sleep(10)
 
 if __name__ == '__main__':

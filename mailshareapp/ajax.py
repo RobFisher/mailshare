@@ -9,6 +9,7 @@ from email_utils import *
 from views import get_expanded_html
 import tags
 import search
+import tag_cloud_cache
 
 # Naming convention: calls from browser to server are prefixed with 'fetch';
 # calls from server to browser are prefixed with 'update'.
@@ -162,9 +163,6 @@ def fetch_multibar(request, selected_mails, propagate, url):
 @dajaxice_register
 def fetch_index_tag_cloud(request, team_id):
     dajax = Dajax()
-    team_search = search.get_team_search(team_id, 7)
-    team_emails = team_search.get_query_set()
-    month_search = search.get_team_search(team_id, 30)
-    tag_cloud = tags.search_results_to_tag_cloud_html(team_emails, month_search)
+    tag_cloud = tag_cloud_cache.get_cached_tag_cloud(team_id)
     dajax.add_data({'tag_cloud_html':tag_cloud}, 'update_index_tag_cloud')
     return dajax.json()
