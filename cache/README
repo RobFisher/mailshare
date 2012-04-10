@@ -1,0 +1,4 @@
+This directory can be used to store tag cloud caches and anything else we
+decide to cache. The MAILSHARE_CACHE_PATH setting should point here and
+this should be writeable by the web server.
+
