@@ -46,13 +46,20 @@ def update_cached_tag_cloud(team_id):
 
 def update_cached_tag_clouds_by_contacts(contacts, verbose=False):
     """Update all the caches affected by the specified set of contacts."""
+    at_least_one_team_updated = False
     for contact in contacts:
         if contact.id in teams.teams_by_contact_id:
             if verbose:
                 print "Updating tag cloud cache for team " + teams.teams_by_contact_id[contact.id].name
             update_cached_tag_cloud(contact.id)
-            if verbose:
-                print "Done."
+            at_least_one_team_updated = True
+
+    if at_least_one_team_updated:
+        if verbose:
+            print "Updating tag cloud for all teams"
+        update_cached_tag_cloud(0)
+        if verbose:
+            print "Done."
 
 
 def get_cached_tag_cloud(team_id):
