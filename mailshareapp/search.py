@@ -99,6 +99,26 @@ class _ExactBodyTextParameter(_Parameter):
         return html
 
 
+class _ExactSubjectTextParameter(_Parameter):
+    parameter_name = 'exactsubject'
+
+    def __init__(self, value, index, search):
+        super(_ExactSubjectTextParameter, self).__init__(value, index, search)
+
+
+    def get_query(self):
+        return Q(subject__contains=self.string_value)
+
+
+    def get_html(self):
+        html = 'Emails with exact text in subject: <a href="'
+        html += get_exact_subject_text_search(self.string_value).get_url_path()
+        html += '">' + self.string_value + '</a>'
+        html += ' ' + self.get_remove_html()
+        return html
+
+
+
 class _TagParameter(_Parameter):
     parameter_name = 'tag_id'
 
@@ -299,6 +319,7 @@ class _AgeInDaysParameter(_Parameter):
 _parameters_map = {
     _FullTextParameter.parameter_name: _FullTextParameter,
     _ExactBodyTextParameter.parameter_name: _ExactBodyTextParameter,
+    _ExactSubjectTextParameter.parameter_name: _ExactSubjectTextParameter,
     _TagParameter.parameter_name: _TagParameter,
     _NotTagParameter.parameter_name: _NotTagParameter,
     _ContactParameter.parameter_name: _ContactParameter,
@@ -568,6 +589,11 @@ def get_full_text_search(query):
 def get_exact_body_text_search(query):
     """Return a new Search object representing an exact body text search for the specified string."""
     return Search([(_ExactBodyTextParameter.parameter_name, query)])
+
+
+def get_exact_subject_text_search(query):
+    """Return a new Search object representing an exact subject text search for the specified string."""
+    return Search([(_ExactSubjectTextParameter.parameter_name, query)])
 
 
 def get_mail_id_search(mail_id):
