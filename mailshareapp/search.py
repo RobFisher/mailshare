@@ -64,7 +64,6 @@ class _Parameter(object):
 class _FullTextParameter(_Parameter):
     parameter_name = 'query'
 
-
     def __init__(self, value, index, search):
         super(_FullTextParameter, self).__init__(value, index, search)
 
@@ -76,6 +75,25 @@ class _FullTextParameter(_Parameter):
     def get_html(self):
         html = 'Emails matching text query: <a href="'
         html += get_full_text_search(self.string_value).get_url_path()
+        html += '">' + self.string_value + '</a>'
+        html += ' ' + self.get_remove_html()
+        return html
+
+
+class _ExactBodyTextParameter(_Parameter):
+    parameter_name = 'exactbody'
+
+    def __init__(self, value, index, search):
+        super(_ExactBodyTextParameter, self).__init__(value, index, search)
+
+
+    def get_query(self):
+        return Q(body__contains=self.string_value)
+
+
+    def get_html(self):
+        html = 'Emails with exact text in body: <a href="'
+        html += get_exact_body_text_search(self.string_value).get_url_path()
         html += '">' + self.string_value + '</a>'
         html += ' ' + self.get_remove_html()
         return html
@@ -280,6 +298,7 @@ class _AgeInDaysParameter(_Parameter):
 # depending on the name in the URL.
 _parameters_map = {
     _FullTextParameter.parameter_name: _FullTextParameter,
+    _ExactBodyTextParameter.parameter_name: _ExactBodyTextParameter,
     _TagParameter.parameter_name: _TagParameter,
     _NotTagParameter.parameter_name: _NotTagParameter,
     _ContactParameter.parameter_name: _ContactParameter,
@@ -544,6 +563,11 @@ class Search:
 def get_full_text_search(query):
     """Return a new Search object representing a full text search for the specified string."""
     return Search([(_FullTextParameter.parameter_name, query)])
+
+
+def get_exact_body_text_search(query):
+    """Return a new Search object representing an exact body text search for the specified string."""
+    return Search([(_ExactBodyTextParameter.parameter_name, query)])
 
 
 def get_mail_id_search(mail_id):
