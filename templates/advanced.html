@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+{% load dajaxice_templatetags %}
+
+<html>
+<head>
+<title>Mailshare Advanced Search</title>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}mailshare.css" />
+<script src="{{ STATIC_URL }}jquery/jquery-1.6.4.js"></script>
+{% dajaxice_js_import %}
+<script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
+
+</head>
+<body>
+<h1>Mailshare Advanced Search</h1>
+
+<p><a href="../">Home</a></p>
+
+<form action="../search/" name="search" method="GET">
+<p>Full text search: <input id="query" name="query-1" value="" /></p>
+<p>Max days into past: <input id="days" name="days" value="30" /></p>
+<p><input id="submit" type="submit" value="Search" /></p>
+</form>
+
+</body>
+</html>
