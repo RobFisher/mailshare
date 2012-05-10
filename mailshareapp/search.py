@@ -88,7 +88,7 @@ class _ExactBodyTextParameter(_Parameter):
 
 
     def get_query(self):
-        return Q(body__contains=self.string_value)
+        return Q(body__icontains=self.string_value)
 
 
     def get_html(self):
@@ -107,7 +107,7 @@ class _ExactSubjectTextParameter(_Parameter):
 
 
     def get_query(self):
-        return Q(subject__contains=self.string_value)
+        return Q(subject__icontains=self.string_value)
 
 
     def get_html(self):
