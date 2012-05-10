@@ -79,3 +79,10 @@ def search_view(request):
     if request.GET.has_key('recipient-2'):
         response.set_cookie('team', request.GET['recipient-2'])
     return response
+
+
+def advanced_view(request):
+    t = loader.get_template('advanced.html')
+    c = RequestContext(request, {})
+    response = HttpResponse(t.render(c))
+    return response

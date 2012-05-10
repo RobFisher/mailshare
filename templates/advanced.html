@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+{% load dajaxice_templatetags %}
+
+<html>
+<head>
+<title>Mailshare Advanced Search</title>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}mailshare.css" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}jquery-ui/jquery-ui-1.8.16.custom.css" />
+<script src="{{ STATIC_URL }}jquery/jquery-1.6.4.js"></script>
+{% dajaxice_js_import %}
+<script src="{{ STATIC_URL }}jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
+<script src="{{ STATIC_URL }}jquery-ui/jquery-ui-1.8.16.custom.min.js"></script>
+
+</head>
+<body>
+<h1>Mailshare Advanced Search</h1>
+
+<p><a href="../">Home</a></p>
+
+<form id="search_form">
+<p>Full text search: <input id="query" name="query" value="" /></p>
+<p>Exact text in body: <input id="exactbody" name="exactbody" value="" /></p>
+<p>Exact test in subject: <input id="exactsubject" name="exactsubject" value="" /></p>
+<p>Tag: <input id="tag_id" name="tag_id" value="" /></p>
+<p>Max days into past: <input id="days" name="days" value="30" /></p>
+<p><button id="submit_button" type="button">Search</button></p>
+</form>
+
+<script type="text/javascript">
+tag_response_callback = null;
+function fetch_tag_completion(request, response) {
+    tag_response_callback = response;
+    Dajaxice.mailshare.mailshareapp.fetch_tag_completion(Dajax.process,{'text':request.term});
+}
+
+function update_tag_completion(data) {
+    if(tag_response_callback) {
+        tag_response_callback(data.tags);
+    }
+}
+
+$(document).ready(function() {
+    $("#submit_button").click(function() {
+        /* remove empty fields; see http://stackoverflow.com/questions/608730 */
+        serializedFormStr = $("#search_form :input[value]").serialize()
+        window.location.href = '/search?' + serializedFormStr;
+    });
+
+    $("#tag_id").autocomplete({source: fetch_tag_completion});
+});
+</script>
+
+</body>
+</html>
