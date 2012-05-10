@@ -125,7 +125,15 @@ class _TagParameter(_Parameter):
 
     def __init__(self, value, index, search):
         super(_TagParameter, self).__init__(value, index, search)
-        self.tid = int(value)
+        try:
+            self.tid = int(value)
+        except ValueError:
+            self.name = value
+            try:
+                tag = models.Tag.objects.get(name=self.name)
+                self.tid = tag.id
+            except models.Tag.DoesNotExist:
+                self.tid = 0
 
 
     def get_query(self):
