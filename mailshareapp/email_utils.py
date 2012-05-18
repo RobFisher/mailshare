@@ -70,6 +70,30 @@ def mail_permalink_html(mail):
     return result
 
 
+def strip_subject_prefixes(subject):
+    """Returns the specified mail subject string stripped of replying and forwarding prefixes."""
+    prefixes = ['re', 'fw', 'fwd']
+    subject_lower = subject.lower()
+    for prefix in prefixes:
+        if subject_lower.startswith(prefix + ' ') or subject_lower.startswith(prefix + ':'):
+            subject = subject[len(prefix)+1:].strip()
+            # recurse because subjects often have multiple "re: Re: Fwd: re:" prefixes
+            subject = strip_subject_prefixes(subject)
+            break
+    return subject
+
+
+def mail_thread_link_html(mail):
+    """Generate a link to the mail's thread in HTML."""
+    result = 'thread'
+    subject = strip_subject_prefixes(mail.subject)
+    if len(subject) > 3:
+        subject_search = search.get_subject_ends_with_search(subject)
+        result = '<a href="' + subject_search.get_url_path()
+        result += '">thread</a>'
+    return result
+
+
 def mail_delete_html(mail):
     """Generate delete link for a mail in HTML."""
     result = '<a href="#" onclick="fetch_delete_mail(' + str(mail.id) + '); return false;">delete</a>'
@@ -82,6 +106,7 @@ def mail_contacts_bar_html(mail, search_object):
     result += contact_to_html(mail.sender, search_object) + '</p><p style="float:right;">'
     if settings.MAILSHARE_ENABLE_DELETE:
         result += mail_delete_html(mail) + ' | '
+    result += mail_thread_link_html(mail) + ' | '
     result += mail_permalink_html(mail) + '</p><div style="clear:both;"></div>'
     result += 'To: '
     result += contacts_queryset_to_html(mail.to.all(), search_object)
