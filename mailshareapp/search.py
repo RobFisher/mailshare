@@ -101,9 +101,11 @@ class _ExactBodyTextParameter(_Parameter):
 
 class _ExactSubjectTextParameter(_Parameter):
     parameter_name = 'exactsubject'
+    html_text = 'Emails with exact text in subject'
 
     def __init__(self, value, index, search):
         super(_ExactSubjectTextParameter, self).__init__(value, index, search)
+        self.html_search_function = get_exact_subject_text_search
 
 
     def get_query(self):
@@ -111,11 +113,25 @@ class _ExactSubjectTextParameter(_Parameter):
 
 
     def get_html(self):
-        html = 'Emails with exact text in subject: <a href="'
-        html += get_exact_subject_text_search(self.string_value).get_url_path()
+        html = self.html_text + ': <a href="'
+        html += self.html_search_function(self.string_value).get_url_path()
         html += '">' + self.string_value + '</a>'
         html += ' ' + self.get_remove_html()
         return html
+
+
+class _SubjectEndsWithParameter(_ExactSubjectTextParameter):
+    parameter_name='subjectends'
+    html_text = 'Emails with subjects ending with'
+
+
+    def __init__(self, value, index, search):
+        super(_ExactSubjectTextParameter, self).__init__(value, index, search)
+        self.html_search_function = get_subject_ends_with_search
+
+
+    def get_query(self):
+        return Q(subject__iendswith=self.string_value)
 
 
 
@@ -328,6 +344,7 @@ _parameters_map = {
     _FullTextParameter.parameter_name: _FullTextParameter,
     _ExactBodyTextParameter.parameter_name: _ExactBodyTextParameter,
     _ExactSubjectTextParameter.parameter_name: _ExactSubjectTextParameter,
+    _SubjectEndsWithParameter.parameter_name: _SubjectEndsWithParameter,
     _TagParameter.parameter_name: _TagParameter,
     _NotTagParameter.parameter_name: _NotTagParameter,
     _ContactParameter.parameter_name: _ContactParameter,
@@ -602,6 +619,11 @@ def get_exact_body_text_search(query):
 def get_exact_subject_text_search(query):
     """Return a new Search object representing an exact subject text search for the specified string."""
     return Search([(_ExactSubjectTextParameter.parameter_name, query)])
+
+
+def get_subject_ends_with_search(query):
+    """Return a new Search object representing a subject ends with search for the specified string."""
+    return Search([(_SubjectEndsWithParameter.parameter_name, query)])
 
 
 def get_mail_id_search(mail_id):
