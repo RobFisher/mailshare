@@ -196,7 +196,14 @@ class _ContactParameter(_Parameter):
 
     def __init__(self, value, index, search):
         super(_ContactParameter, self).__init__(value, index, search)
-        self.cid = int(value)
+        try:
+            self.cid = int(value)
+        except ValueError:
+            matching_contacts = models.Contact.objects.filter(name__iexact=value)
+            if len(matching_contacts) > 0:
+                self.cid = matching_contacts[0].id
+            else:
+                self.cid = 0
 
 
     def get_contact_name_html(self):
