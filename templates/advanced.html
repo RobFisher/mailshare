@@ -44,6 +44,19 @@ function update_tag_completion(data) {
     }
 }
 
+contact_response_callback = null;
+function fetch_contact_completion(request, response) {
+    contact_response_callback = response;
+    Dajaxice.mailshare.mailshareapp.fetch_contact_completion(Dajax.process,{'text':request.term});
+}
+
+function update_contact_completion(data) {
+    if(contact_response_callback) {
+        contact_response_callback(data.contacts);
+    }
+}
+
+
 $(document).ready(function() {
     $("#submit_button").click(function() {
         /* remove empty fields; see http://stackoverflow.com/questions/608730 */
@@ -52,6 +65,9 @@ $(document).ready(function() {
     });
 
     $("#tag_id").autocomplete({source: fetch_tag_completion});
+    $("#sender").autocomplete({source: fetch_contact_completion});
+    $("#recipient").autocomplete({source: fetch_contact_completion});
+    $("#contact").autocomplete({source: fetch_contact_completion});
 });
 </script>
 
