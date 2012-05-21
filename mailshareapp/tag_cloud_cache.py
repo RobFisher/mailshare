@@ -1,6 +1,7 @@
 from django.conf import settings
 from mailshareapp.models import Mail, Contact, Tag
 import tags
+import people
 import search
 import os
 import teams
@@ -9,7 +10,16 @@ def _get_tag_cloud_html(team_id):
     team_search = search.get_team_search(team_id, 7)
     team_emails = team_search.get_query_set()
     month_search = search.get_team_search(team_id, 30)
-    tag_cloud_html = tags.search_results_to_tag_cloud_html(team_emails, month_search)
+    tag_cloud_html = '<div id="tag_cloud" class="tag_cloud">'
+    tag_cloud_html += tags.search_results_to_tag_cloud_html(team_emails, month_search)
+    tag_cloud_html += '</div>'
+
+    # it's untidy to put top senders code in the tag cloud cache like this, but it gets us
+    # going for now.
+    # TODO - tidy this up; possibly just search and replace "tag_cloud" with "index_page_stats" in this file.
+    tag_cloud_html += '<p>Top senders in the last week:</p>'
+    tag_cloud_html += people.search_results_to_top_senders_html(team_emails, month_search)
+
     return tag_cloud_html
 
 
