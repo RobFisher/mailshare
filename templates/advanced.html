@@ -24,6 +24,9 @@
 <p>Exact text in body: <input id="exactbody" name="exactbody" value="" /></p>
 <p>Exact text in subject: <input id="exactsubject" name="exactsubject" value="" /></p>
 <p>Tag: <input id="tag_id" name="tag_id" value="" /></p>
+<p>Sender: <input id="sender" name="sender" value="" /></p>
+<p>Recipient: <input id="recipient" name="recipient" value="" /></p>
+<p>Sender or recipient: <input id="contact" name="contact" value="" /></p>
 <p>Max days into past: <input id="days" name="days" value="30" /></p>
 <p><button id="submit_button" type="button">Search</button></p>
 </form>
@@ -41,6 +44,19 @@ function update_tag_completion(data) {
     }
 }
 
+contact_response_callback = null;
+function fetch_contact_completion(request, response) {
+    contact_response_callback = response;
+    Dajaxice.mailshare.mailshareapp.fetch_contact_completion(Dajax.process,{'text':request.term});
+}
+
+function update_contact_completion(data) {
+    if(contact_response_callback) {
+        contact_response_callback(data.contacts);
+    }
+}
+
+
 $(document).ready(function() {
     $("#submit_button").click(function() {
         /* remove empty fields; see http://stackoverflow.com/questions/608730 */
@@ -49,6 +65,9 @@ $(document).ready(function() {
     });
 
     $("#tag_id").autocomplete({source: fetch_tag_completion});
+    $("#sender").autocomplete({source: fetch_contact_completion});
+    $("#recipient").autocomplete({source: fetch_contact_completion});
+    $("#contact").autocomplete({source: fetch_contact_completion});
 });
 </script>
 

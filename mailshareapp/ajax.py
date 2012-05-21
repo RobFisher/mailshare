@@ -133,6 +133,21 @@ def fetch_tag_completion(request, text):
 
 
 @dajaxice_register
+def fetch_contact_completion(request, text):
+    dajax = Dajax()
+    contacts = None
+    if len(text) == 1:
+        contacts = Contact.objects.filter(name__istartswith=text)
+    else:
+        contacts = Contact.objects.filter(name__icontains=text)
+    response = []
+    for contact in contacts:
+        response.append(contact.name)
+    dajax.add_data({'contacts':response}, 'update_contact_completion')
+    return dajax.json()
+
+
+@dajaxice_register
 def fetch_delete_mail(request, email_id):
     dajax = Dajax()
     logger = logging.getLogger('ajax')
