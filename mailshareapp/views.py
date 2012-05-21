@@ -8,6 +8,7 @@ from mailshareapp.models import Mail, Contact, Tag
 import search
 import email_utils
 import tags
+import people
 import settings
 import teams
 
@@ -57,6 +58,7 @@ def get_expanded_html(mail, current_search=None):
 def search_view(request):
     search_query = get_string(request, 'query')
     tag_cloud = ''
+    top_senders = ''
     expanded_html = ''
     
     s = search.Search(request.GET.items())
@@ -65,6 +67,7 @@ def search_view(request):
         expanded_html = get_expanded_html(s.get_query_set()[0], s)
     elif len(s.get_query_set()) != 0:
         tag_cloud = tags.search_results_to_tag_cloud_html(s.get_query_set(), s)
+        top_senders = people.search_results_to_top_senders_html(s.get_query_set(), s)
 
     t = loader.get_template('search.html')
     c = RequestContext(request, {
@@ -72,6 +75,7 @@ def search_view(request):
         'hidden_form': s.get_hidden_form_html(),
         'search_html': s.get_html(),
         'tag_cloud': tag_cloud,
+        'top_senders' : top_senders,
         'expanded_html': expanded_html,
         'results' : s.get_query_set(),
     })

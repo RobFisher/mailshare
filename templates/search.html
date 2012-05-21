@@ -38,6 +38,11 @@
     </div>
 {% endif %}
 
+{% if top_senders %}
+    <p>Top senders for these results:</p>
+    {% autoescape off %}{{ top_senders }}{% endautoescape %}
+{% endif %}
+
 {% if results %}
     <div class="multi_bar">
         <input type="button" onclick="select_all_or_none()" value="All/None" />

@@ -178,6 +178,7 @@ def fetch_multibar(request, selected_mails, propagate, url):
 @dajaxice_register
 def fetch_index_tag_cloud(request, team_id):
     dajax = Dajax()
-    tag_cloud = tag_cloud_cache.get_cached_tag_cloud(team_id)
-    dajax.add_data({'tag_cloud_html':tag_cloud}, 'update_index_tag_cloud')
+    stats = tag_cloud_cache.get_cached_tag_cloud(team_id)
+    print stats
+    dajax.add_data({'stats_html':stats}, 'update_index_stats')
     return dajax.json()
