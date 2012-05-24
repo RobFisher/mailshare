@@ -87,6 +87,6 @@ def search_view(request):
 
 def advanced_view(request):
     t = loader.get_template('advanced.html')
-    c = RequestContext(request, {})
+    c = RequestContext(request, {'teams': teams.teams})
     response = HttpResponse(t.render(c))
     return response
