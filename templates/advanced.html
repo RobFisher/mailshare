@@ -20,6 +20,17 @@
 <p><a href="../">Home</a></p>
 
 <form id="search_form">
+{% if teams|length > 0 %}
+<p>
+Team: <select id="team" title="Filter results by team" name="recipient-1">
+    <option value="0">All</option>
+    {% for team in teams %}
+        <option value="{{ team.contact_id }}" >{{ team.name }}</option>
+    {% endfor %}
+</select>
+</p>
+{% endif %}
+
 <p>Full text search: <input id="query" name="query-2" value="" /></p>
 <p>Exact text in body: <input id="exactbody" name="exactbody-3" value="" /></p>
 <p>Exact text in subject: <input id="exactsubject" name="exactsubject-4" value="" /></p>
