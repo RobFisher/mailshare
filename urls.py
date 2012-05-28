@@ -12,6 +12,7 @@ urlpatterns = patterns('mailshareapp.views',
     (r'^$', 'index_view'),
     (r'^search/$', 'search_view'),
     (r'^advanced/$', 'advanced_view'),
+    (r'^teams/$', 'teams_view'),
     #(r'^browse/$', 'browse'),
     #(r'^view/(?P<email_id>\d+)/$', 'email'),
 )
