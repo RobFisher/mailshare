@@ -90,3 +90,10 @@ def advanced_view(request):
     c = RequestContext(request, {'teams': teams.teams})
     response = HttpResponse(t.render(c))
     return response
+
+
+def teams_view(request):
+    t = loader.get_template('teams.html')
+    c = RequestContext(request, {'teams': teams.teams})
+    response = HttpResponse(t.render(c))
+    return response
