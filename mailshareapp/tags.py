@@ -2,7 +2,6 @@
 
 import re
 import math
-from django.utils.html import strip_tags
 from django.db.models import Q
 import models
 import search
@@ -68,7 +67,9 @@ for regex_tag in settings.MAILSHARE_TAGS_REGEX:
 
 def add_regex_tags_to_mail(m, test=False):
     global regex_tags_compiled
-    body = strip_tags(m.body)
+    # this regular expression is from django.utils.html.strip_tags but we need to replace tags
+    # with spaces to avoid running strings together in, e.g. '<p>one</p><p>two</p>'.
+    body = re.sub(r'<[^>]*?>', ' ', m.body)
     tags_to_add = set()
     for regex in regex_tags_compiled:
         regex_matches = re.findall(regex, m.subject)
