@@ -39,10 +39,12 @@ def add_autotags_to_mail(m):
             m.tags.add(t)
 
 
-user_tags_expression = r'tags?:\s*([,-\.\w ]*)'
+user_tags_expression = r'tags?:\s*([,;\-\.\w ]*)'
 user_tags_compiled = re.compile(user_tags_expression, re.IGNORECASE)
 outlook_linefeed = re.compile(r'\r\n')
 html_entity = re.compile(r'&\w*;')
+tag_split_expression = r'([\-\.\w ]+)[,;]'
+tag_split_compiled = re.compile(tag_split_expression)
 
 def add_usertags_to_mail(m):
     body = m.body
@@ -52,7 +54,7 @@ def add_usertags_to_mail(m):
         body = re.sub(html_entity, '', body)
     taglists = re.findall(user_tags_compiled, body)
     for taglist in taglists:
-        tags = taglist.split(',')
+        tags = re.split(tag_split_compiled, taglist)
         for tag in tags:
             tag = tag.strip()
             if len(tag) <= models.Tag.MAX_TAG_NAME_LENGTH and len(tag) > 0:
