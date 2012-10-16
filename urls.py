@@ -7,12 +7,14 @@ admin.autodiscover()
 
 from dajaxice.core import dajaxice_autodiscover
 dajaxice_autodiscover()
+from RSSFeed import LatestMailsFeed
 
 urlpatterns = patterns('mailshareapp.views',
     (r'^$', 'index_view'),
     (r'^search/$', 'search_view'),
     (r'^advanced/$', 'advanced_view'),
     (r'^teams/$', 'teams_view'),
+    (r'feed/search/$', LatestMailsFeed()),
     #(r'^browse/$', 'browse'),
     #(r'^view/(?P<email_id>\d+)/$', 'email'),
 )

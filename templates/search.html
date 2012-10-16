@@ -79,6 +79,9 @@
 {% else %}
     <p>No results found.</p>
 {% endif %}
+{% if rssFeedURL %}
+    <a href="{{ rssFeedURL }}">RSS</a>    
+{% endif %}
 </form>    
 </body>
 </html>

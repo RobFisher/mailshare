@@ -5,12 +5,14 @@ from django.template import RequestContext, loader
 from django.http import HttpResponse
 from django.db.models import Q
 from mailshareapp.models import Mail, Contact, Tag
-import search
+
 import email_utils
 import tags
 import people
 import settings
 import teams
+import search
+
 
 
 def index_view(request):
@@ -62,13 +64,15 @@ def search_view(request):
     expanded_html = ''
     
     s = search.Search(request.GET.items())
-
+   
     if len(s.get_query_set()) == 1:
         expanded_html = get_expanded_html(s.get_query_set()[0], s)
     elif len(s.get_query_set()) != 0:
         tag_cloud = tags.search_results_to_tag_cloud_html(s.get_query_set(), s)
         top_senders = people.search_results_to_top_senders_html(s.get_query_set(), s)
-
+    strRequestURL =  "http://"+ request.META['HTTP_HOST']+request.get_full_path()
+    strRequestURL=strRequestURL.replace("search", "feed/search")
+    
     t = loader.get_template('search.html')
     c = RequestContext(request, {
         'query_name': s.get_form_query_name(),
@@ -78,6 +82,7 @@ def search_view(request):
         'top_senders' : top_senders,
         'expanded_html': expanded_html,
         'results' : s.get_query_set(),
+        'rssFeedURL' : strRequestURL,
     })
     response = HttpResponse(t.render(c))
     if request.GET.has_key('recipient-2'):
