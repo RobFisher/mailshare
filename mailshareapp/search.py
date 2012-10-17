@@ -524,6 +524,14 @@ class Search:
 
         return self._url_path
 
+    def get_rss_url(self):
+        """Return a URL path that links to this search."""
+        if self._url_path == None:
+            self._url_path = '/feed/search/?'
+            self._url_path = self._append_url_parameters(self._url_path)
+
+        return self._url_path
+
 
     def _copy(self, root_search=None):
         # Create a copy of this search. Using this we avoid modifying existing Search objects, so that

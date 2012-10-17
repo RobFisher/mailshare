@@ -70,8 +70,7 @@ def search_view(request):
     elif len(s.get_query_set()) != 0:
         tag_cloud = tags.search_results_to_tag_cloud_html(s.get_query_set(), s)
         top_senders = people.search_results_to_top_senders_html(s.get_query_set(), s)
-    strRequestURL =  "http://"+ request.META['HTTP_HOST']+request.get_full_path()
-    strRequestURL=strRequestURL.replace("search", "feed/search")
+    strRequestURL =  "http://"+ request.META['HTTP_HOST']+s.get_rss_url()
     
     t = loader.get_template('search.html')
     c = RequestContext(request, {

@@ -24,8 +24,8 @@ class MailsFeed(Feed):
     def items(self):       
         return self.search.get_query_set()
 
-    def item_link(self, item):        	
-        return ("http://" + self.request_url)
+    def item_link(self, item):
+        return("http://"+self.request_host+get_mail_id_search(item.id).get_url_path())
 
     def item_title(self, item):
         return item.subject
