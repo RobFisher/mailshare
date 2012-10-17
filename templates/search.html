@@ -16,7 +16,13 @@
 
 </head>
 <body>
-<h1><a href="/">Mailshare Search</a></h1>
+<h1>
+<a href="/">Mailshare Search</a>
+{% if rssFeedURL %}
+    <a href="{{ rssFeedURL }}"><img src="{{ MEDIA_URL }}/RSS-Feed-icon.png"/></a>   
+{% endif %}
+</h1>
+	    
 <form action="/search/" name="search" method="GET">
 <input id="query" name="{{ query_name }}" value="" />
 {% if hidden_form %}
@@ -78,9 +84,6 @@
     </table>
 {% else %}
     <p>No results found.</p>
-{% endif %}
-{% if rssFeedURL %}
-    <a href="{{ rssFeedURL }}">RSS</a>    
 {% endif %}
 </form>    
 </body>
