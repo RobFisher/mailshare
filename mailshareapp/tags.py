@@ -2,7 +2,6 @@
 
 import re
 import math
-from django.utils.html import strip_tags
 from django.db.models import Q
 import models
 import search
@@ -40,10 +39,12 @@ def add_autotags_to_mail(m):
             m.tags.add(t)
 
 
-user_tags_expression = r'tags?:\s*([,-\.\w ]*)'
+user_tags_expression = r'tags?:\s*([,;\-\.\w ]*)'
 user_tags_compiled = re.compile(user_tags_expression, re.IGNORECASE)
 outlook_linefeed = re.compile(r'\r\n')
 html_entity = re.compile(r'&\w*;')
+tag_split_expression = r'([\-\.\w ]+)[,;]'
+tag_split_compiled = re.compile(tag_split_expression)
 
 def add_usertags_to_mail(m):
     body = m.body
@@ -53,7 +54,7 @@ def add_usertags_to_mail(m):
         body = re.sub(html_entity, '', body)
     taglists = re.findall(user_tags_compiled, body)
     for taglist in taglists:
-        tags = taglist.split(',')
+        tags = re.split(tag_split_compiled, taglist)
         for tag in tags:
             tag = tag.strip()
             if len(tag) <= models.Tag.MAX_TAG_NAME_LENGTH and len(tag) > 0:
@@ -68,7 +69,9 @@ for regex_tag in settings.MAILSHARE_TAGS_REGEX:
 
 def add_regex_tags_to_mail(m, test=False):
     global regex_tags_compiled
-    body = strip_tags(m.body)
+    # this regular expression is from django.utils.html.strip_tags but we need to replace tags
+    # with spaces to avoid running strings together in, e.g. '<p>one</p><p>two</p>'.
+    body = re.sub(r'<[^>]*?>', ' ', m.body)
     tags_to_add = set()
     for regex in regex_tags_compiled:
         regex_matches = re.findall(regex, m.subject)
