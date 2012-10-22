@@ -8,7 +8,6 @@ from mailshareapp.search import get_mail_id_search
 
 class MailsFeed(Feed):    
     title = "Search Mails On Mailshare"
-    link = "http://"
     description = "Updates on changes."
     search=[]
     request_url=''
@@ -16,10 +15,12 @@ class MailsFeed(Feed):
     title_template='rss/mail_title.html';
     def get_object(self, request):
         self.search = Search(request.GET.items()) 
-        self.request_host= request.META['HTTP_HOST']  
-        self.request_url =  self.link +self.request_host+self.search.get_url_path()        
-        self.link=self.request_url                
-        return self.search    
+        self.request_host= request.META['HTTP_HOST'] 
+        return self.search   
+
+    def link(self, obj):
+	self.request_url =  "http://" + self.request_host + self.search.get_url_path()
+        return self.request_url
 
     def items(self):       
         return self.search.get_query_set()
