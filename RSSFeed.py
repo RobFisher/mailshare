@@ -6,8 +6,7 @@ from mailshareapp import email_utils
 from mailshareapp.search import Search
 from mailshareapp.search import get_mail_id_search
 
-class MailsFeed(Feed):    
-    title = "Search Mails On Mailshare"
+class MailsFeed(Feed):
     description = "Updates on changes."
     search=[]
     request_url=''
@@ -21,6 +20,9 @@ class MailsFeed(Feed):
     def link(self, obj):
 	self.request_url =  "http://" + self.request_host + self.search.get_url_path()
         return self.request_url
+
+    def title(self, obj):
+        return ("Mailshare Mails " + self.search.get_title())
 
     def items(self):       
         return self.search.get_query_set()
