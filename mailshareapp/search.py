@@ -79,6 +79,10 @@ class _FullTextParameter(_Parameter):
         html += ' ' + self.get_remove_html()
         return html
 
+    def get_title(self):
+        html = 'Text query: ' + self.string_value + '; '
+        return html
+
 
 class _ExactBodyTextParameter(_Parameter):
     parameter_name = 'exactbody'
@@ -96,6 +100,10 @@ class _ExactBodyTextParameter(_Parameter):
         html += get_exact_body_text_search(self.string_value).get_url_path()
         html += '">' + self.string_value + '</a>'
         html += ' ' + self.get_remove_html()
+        return html
+
+    def get_title(self):
+        html = 'Text in body: ' + self.string_value + '; '
         return html
 
 
@@ -117,6 +125,10 @@ class _ExactSubjectTextParameter(_Parameter):
         html += self.html_search_function(self.string_value).get_url_path()
         html += '">' + self.string_value + '</a>'
         html += ' ' + self.get_remove_html()
+        return html
+
+    def get_title(self):
+        html = 'Text in subject: ' + self.string_value + '; '
         return html
 
 
@@ -165,12 +177,25 @@ class _TagParameter(_Parameter):
             html = tags.tag_to_html(tag)
         return html
 
+    def get_tag_name(self):
+        try:
+            tag = models.Tag.objects.get(id=self.tid)
+        except models.Tag.DoesNotExist:
+            html = 'unknown'
+        else:
+            html = tag.name
+        return html
+
 
     def get_html(self):
         html = 'Emails with tag '
         html += self.get_tag_name_html()
         html += '<br />[with|' + self.get_option_link_html(get_ntag_id_search(self.tid), 'without') + ']'
         html += self.get_remove_html()
+        return html
+
+    def get_title(self):
+        html = 'Tag: ' + self.get_tag_name() + '; '
         return html
 
 
@@ -187,6 +212,10 @@ class _NotTagParameter(_TagParameter):
         html += self.get_tag_name_html()
         html += '<br />[' + self.get_option_link_html(get_tag_id_search(self.tid), 'with') + '|without]'
         html += self.get_remove_html()
+        return html
+
+    def get_title(self):
+        html = 'Without Tag: ' + self.get_tag_name() + '; '
         return html
 
 
@@ -216,6 +245,16 @@ class _ContactParameter(_Parameter):
             html += email_utils.contact_to_html(sender)
         return html
 
+    def get_contact_name(self):
+        html = ''
+        try:
+            sender = models.Contact.objects.get(id=self.cid)
+        except models.Contact.DoesNotExist:
+            html += 'unknown'
+        else:
+            html += sender.name
+        return html
+
 
     def get_query(self):
         return Q(sender__id=self.cid) | Q(to__id=self.cid) | Q(cc__id=self.cid)
@@ -228,6 +267,10 @@ class _ContactParameter(_Parameter):
         html += '|' + self.get_option_link_html(get_sender_id_search(self.cid), 'from')
         html += '|to or from]'
         html += self.get_remove_html()
+        return html
+
+    def get_title(self):
+        html = 'To or From: ' + get_contact_name() + '; '
         return html
 
 
@@ -250,6 +293,10 @@ class _SenderParameter(_ContactParameter):
         html += self.get_remove_html()
         return html
 
+    def get_title(self):
+        html = 'Sender: ' + self.get_contact_name() + '; '
+        return html
+
 
 class _RecipientParameter(_ContactParameter):
     parameter_name = 'recipient'
@@ -270,6 +317,10 @@ class _RecipientParameter(_ContactParameter):
         html += self.get_remove_html()
         return html
 
+    def get_title(self):
+        html = 'Recipient: ' + self.get_contact_name() + '; '
+        return html
+
 
 class _MailParameter(_Parameter):
     parameter_name = 'mail_id'
@@ -287,6 +338,10 @@ class _MailParameter(_Parameter):
     def get_html(self):
         html = 'Email with unique id ' + self.string_value
         html += ' ' + self.get_remove_html()
+        return html
+
+    def get_title(self):
+        html = 'Mail-id: ' + self.string_value + '; '
         return html
 
 
@@ -342,6 +397,10 @@ class _AgeInDaysParameter(_Parameter):
             html += '|year'
         html += ']'
         html += self.get_remove_html()
+        return html
+
+    def get_title(self):
+        html = 'Sent in the last: ' + self.string_value + ' days; '
         return html
 
 
@@ -487,6 +546,19 @@ class Search:
 
         return self._html
 
+    
+    def get_title(self):
+        """Returns a plain text describing the search parameters"""
+        if self._html == None:
+            self._html = ' '
+            if self._parameter:
+                self._html += self._parameter.get_title()
+            self._html += ' '
+            if self._and:
+                self._html += self._and.get_title()
+
+        return self._html
+
 
     def get_hidden_form_html(self):
         """Return HTML representing hidden form items that represent the current search and will recreate it with a GET request."""
@@ -520,6 +592,14 @@ class Search:
         """Return a URL path that links to this search."""
         if self._url_path == None:
             self._url_path = '/search/?'
+            self._url_path = self._append_url_parameters(self._url_path)
+
+        return self._url_path
+
+    def get_rss_url(self):
+        """Return a URL path that links to this search."""
+        if self._url_path == None:
+            self._url_path = '/feed/search/?'
             self._url_path = self._append_url_parameters(self._url_path)
 
         return self._url_path
