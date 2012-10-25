@@ -12,6 +12,7 @@ def get_server_connection():
     if _server == None:
         _server = imaplib.IMAP4_SSL(settings.MAILSHARE_IMAP_HOST)
         _server.login(settings.MAILSHARE_IMAP_USER, settings.MAILSHARE_IMAP_PASSWORD)
+        _server.select(settings.MAILSHARE_IMAP_MAILBOX)
     return _server
 
 
@@ -23,7 +24,6 @@ def fetch_messages(max_messages=10, output_file=None, expunge=False):
     messages = []
 
     server = get_server_connection()
-    server.select(settings.MAILSHARE_IMAP_MAILBOX, readonly = True)
     typ, message_ids = server.search(None, 'ALL')
 
     # message_ids is a list with one item, so it looks like this:
@@ -33,7 +33,11 @@ def fetch_messages(max_messages=10, output_file=None, expunge=False):
     message_ids_to_fetch = message_ids[0].split()[0:max_messages]
 
     for message_id in message_ids_to_fetch:
-        typ, message_data = server.fetch(message_id, '(RFC822)')
+        try:
+            typ, message_data = server.fetch(message_id, '(RFC822)')
+        except:
+            print 'Exception processing message ' + str(message_id)
+            continue
         for part in message_data:
             if isinstance(part, tuple):
                 if output_file != None:
