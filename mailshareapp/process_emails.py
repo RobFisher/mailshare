@@ -9,6 +9,7 @@ import poll_imap_email
 from mailshare.mailshareapp.models import Mail, Contact, Tag
 from tags import add_tags_to_mail, add_regex_tags_to_mail
 import tag_cloud_cache
+import settings
 
 def get_body(message):
     """Search all the MIME parts of the and return a tuple consisting of the content type and text of the body.
@@ -159,6 +160,8 @@ def add_message_to_database(message):
         contacts = add_contacts_to_mail(m.cc, message.get_all('cc'))
         contact_set |= contacts
         add_tags_to_mail(m)
+        for hook in settings.MAILSHARE_NEW_EMAIL_HOOKS:
+            hook(m)
     return contact_set
 
 

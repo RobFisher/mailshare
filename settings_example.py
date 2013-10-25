@@ -41,6 +41,9 @@ MAILSHARE_TEAMS = {
 # in it.
 MAILSHARE_CACHE_PATH='/srv/www/mailshare/cache'
 
+# A list of functions that will be called with each new email
+MAILSHARE_NEW_EMAIL_HOOKS = []
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
