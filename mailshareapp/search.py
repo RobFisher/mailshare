@@ -270,7 +270,7 @@ class _ContactParameter(_Parameter):
         return html
 
     def get_title(self):
-        html = 'To or From: ' + get_contact_name() + '; '
+        html = 'To or From: ' + self.get_contact_name() + '; '
         return html
 
 
